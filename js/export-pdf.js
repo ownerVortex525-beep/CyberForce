@@ -6,7 +6,7 @@ document.getElementById('btnPdf').addEventListener('click', async () => {
   btn.disabled = true; btn.textContent = 'Generating…';
   try {
     const dark = sheet.classList.contains('dark');
-    const canvas = await html2canvas(sheet, { scale: 2, backgroundColor: dark ? '#0b0f14' : '#ffffff', useCORS: true });
+    const canvas = await html2canvas(sheet, { scale: 3, backgroundColor: dark ? '#0b0f14' : '#ffffff', useCORS: true });
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageW = 210, pageH = 297;
