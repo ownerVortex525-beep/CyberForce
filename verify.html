@@ -37,14 +37,15 @@
   <main class="container">
     <div class="verify-box">
       <h2 class="panel-title">Case Verification</h2>
-      <p class="panel-sub">Report par likha Case ID enter karein — ya QR scan karke aaye hain toh auto-verify hoga.</p>
+      <p class="panel-sub">Enter the Case ID printed on the report — or scan the QR code for auto-verification.</p>
       <div class="field"><label>Case ID</label><input id="caseInput" placeholder="CF-2026-1234"></div>
       <button class="btn btn-primary" id="verifyBtn">Verify</button>
       <div class="verify-result" id="result"></div>
-      <p class="note">🔒 Privacy note: Records usi device par store hote hain jahan report banayi gayi thi (100% client-side system). Doosre device par verify karne ke liye printed report ka Case ID aur evidence ke SHA-256 hashes manually match karein.</p>
+      <p class="note">🔒 Privacy note: Records are stored only on the device where the report was created (100% client-side system). To verify on another device, match the Case ID, date and SHA-256 evidence hashes on the printed report.</p>
     </div>
   </main>
-   <script src="js/tracker.js"></script>
+
+  <script src="js/tracker.js"></script>
   <script>
     const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const input = document.getElementById('caseInput');
@@ -54,7 +55,7 @@
     function doVerify(){
       const id = input.value.trim();
       const box = document.getElementById('result');
-      if (!id) { alert('Case ID enter karein.'); return; }
+      if (!id) { alert('Please enter a Case ID.'); return; }
       const list = JSON.parse(localStorage.getItem('cf_reports') || '[]');
       const rec = list.find(r => r.caseId === id);
       box.style.display = 'block';
@@ -69,7 +70,7 @@
       } else {
         box.className = 'verify-result no';
         box.innerHTML = `<strong>❌ No record found on this device.</strong><br>
-          <span class="note">Yeh report kisi doosre device par banayi gayi ho sakti hai (privacy-first design). Authenticity ke liye printed report ke Case ID, date aur SHA-256 evidence hashes match karein.</span>`;
+          <span class="note">This report may have been created on another device (privacy-first design). Match the Case ID, date and SHA-256 evidence hashes on the printed report.</span>`;
       }
     }
     document.getElementById('verifyBtn').addEventListener('click', doVerify);
