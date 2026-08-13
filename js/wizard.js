@@ -1,7 +1,24 @@
-/* ============ CyberForce Wizard Logic (v6 — PDF-safe images) ============ */
+/* ============ CyberForce Wizard Logic (v7) ============ */
 let current = 1;
 let startedTracked = false;
 window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+
+/* ---- Runtime PDF-safe CSS (purani files ko override karta hai) ---- */
+(function(){
+  const fix = document.createElement('style');
+  fix.textContent =
+    '.sheet .meta{display:block !important}.sheet .meta span{display:inline-block;margin-right:18px}' +
+    '.sheet .rrow{display:block !important;line-height:1.55 !important}' +
+    '.sheet .rl{display:inline !important;min-width:0 !important;margin-right:6px}' +
+    '.sheet .rv{display:inline !important;word-break:break-word}' +
+    '.sheet .sig{display:block !important}.sheet .sig > span{display:block;margin-bottom:10px}' +
+    '.sheet .stamp{display:block !important;line-height:90px;text-align:center}' +
+    '.sheet .exgrid{display:block !important}' +
+    '.sheet .ex{display:inline-block !important;vertical-align:top;margin:0 14px 14px 0;max-width:48%}' +
+    '.sheet .ex img{display:block;margin:0 auto;border:1px solid #999;background:#fff}' +
+    '.sheet .photo{float:right;margin:0 0 10px 14px;border:2px solid #0b2447;outline:1px solid #1d4ed8}';
+  document.head.appendChild(fix);
+})();
 
 const FIELD_IDS = ['sName','sPhone','sAltPhone','sPayment','sUpi','sCrypto','sInsta','sTgUser','sTgId','sOther','sSocial','cType','cPlatform','cDate','cAmount','dText','oReceived','oStation','oStatus','oRemarks','dName','dContact'];
 
@@ -9,7 +26,6 @@ const val = id => { const el = document.getElementById(id); return el ? el.value
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const ml = s => esc(s).replace(/\n/g,'<br>');
 
-/* Image ko original ratio mein fit karo — kabhi stretch nahi */
 function fitSize(w, h, maxW, maxH){
   const s = Math.min(maxW / (w || 1), maxH / (h || 1), 1);
   return { w: Math.max(40, Math.round((w || 1) * s)), h: Math.max(40, Math.round((h || 1) * s)) };
@@ -46,7 +62,7 @@ document.getElementById('btnNext').addEventListener('click', () => {
     if (window.CF_TRACK) CF_TRACK('report_completed', val('cType'));
   }
   if (current === 7) {
-    if (confirm('Start a new report? The current draft will be cleared.')) {
+    if (confirm('Start a new report? All data will be cleared.')) {
       localStorage.removeItem('cf_draft');
       location.reload();
     }
@@ -60,6 +76,14 @@ document.getElementById('btnBack').addEventListener('click', () => showStep(Math
 document.querySelectorAll('.wizard-steps li').forEach(li => li.addEventListener('click', () => {
   const t = +li.dataset.step;
   if (t <= current) showStep(t);
+}));
+
+/* ---- AUTO-CLEAR: export ke baad sab data saaf ---- */
+['btnPdf', 'btnDoc'].forEach(id => document.getElementById(id).addEventListener('click', () => {
+  setTimeout(() => {
+    localStorage.removeItem('cf_draft');
+    if (confirm('Report downloaded. Clear all data and start a NEW report?')) location.reload();
+  }, 1200);
 }));
 
 /* ---- Word counter + draft autosave ---- */
@@ -106,7 +130,7 @@ function getFormData(){
   };
 }
 
-/* ---- Report sheet builder (PDF-safe block layout + exact image sizes) ---- */
+/* ---- Report sheet builder ---- */
 function row(label, value, mono){
   if (!value) return '';
   return `<div class="rrow"><span class="rl">${label}:</span> <span class="rv ${mono ? 'mono' : ''}">${ml(value)}</span></div>`;
