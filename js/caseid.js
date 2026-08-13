@@ -1,5 +1,5 @@
 /* ============ Case ID + QR Verification + Report Meta ============ */
-window.CF_SITE_URL = ''; // Hosting ke baad yahan apna URL daalna, jaise: 'https://cyberforcereport.netlify.app'
+window.CF_SITE_URL = 'https://cyberforcereport.netlify.app'; // ⬅️ YAHAN APNA ASLI URL (bina aakhri / ke)
 
 function verifyLink(d){
   const id = d.caseId || window.CF_CASE_ID;
@@ -19,7 +19,6 @@ window.renderQR = function(box, d){
   box.appendChild(cap);
 };
 
-/* My Reports / Verify pages (Phase 4) ke liye meta save */
 window.saveReportMeta = function(d){
   try {
     const list = JSON.parse(localStorage.getItem('cf_reports') || '[]');
