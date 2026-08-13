@@ -1,4 +1,4 @@
-/* ============ CyberForce Wizard Logic (Final v3 + Tracking) ============ */
+/* ============ CyberForce Wizard Logic (v4) ============ */
 let current = 1;
 let startedTracked = false;
 window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -9,13 +9,23 @@ const val = id => { const el = document.getElementById(id); return el ? el.value
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const ml = s => esc(s).replace(/\n/g,'<br>');
 
+/* ---- Theme toggle (Dark / Light) ---- */
+const themeBtn = document.getElementById('themeToggle');
+function applyTheme(t){
+  document.body.dataset.theme = t;
+  localStorage.setItem('cf_theme', t);
+  themeBtn.textContent = (t === 'dark') ? 'Light Mode' : 'Dark Mode';
+}
+applyTheme(localStorage.getItem('cf_theme') || 'light');
+themeBtn.addEventListener('click', () => applyTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
+
 /* ---- Navigation ---- */
 function showStep(n){
   current = n;
   document.querySelectorAll('.step-panel').forEach(p => p.classList.toggle('show', +p.dataset.step === n));
   document.querySelectorAll('.wizard-steps li').forEach(li => li.classList.toggle('active', +li.dataset.step === n));
   document.getElementById('btnBack').style.visibility = (n === 1) ? 'hidden' : 'visible';
-  document.getElementById('btnNext').textContent = (n === 6) ? 'Preview & Export' : (n === 7 ? 'Finish' : 'Next Section');
+  document.getElementById('btnNext').textContent = (n === 6) ? 'Preview and Export' : (n === 7 ? 'Finish' : 'Next Section');
   if (n === 7) renderPreview();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -24,13 +34,13 @@ document.getElementById('btnNext').addEventListener('click', () => {
   if (current === 1 && !startedTracked) { if (window.CF_TRACK) CF_TRACK('report_started'); startedTracked = true; }
   if (current === 6) {
     if (!val('dName') || !document.getElementById('declCheck').checked) {
-      alert('Declaration complete karein: Complainant Name aur truth checkbox zaroori hai.');
+      alert('Complete the declaration: Complainant Name and the truth checkbox are required.');
       return;
     }
     if (window.CF_TRACK) CF_TRACK('report_completed', val('cType'));
   }
   if (current === 7) {
-    if (confirm('Naya report shuru karein? Current draft clear ho jayega.')) {
+    if (confirm('Start a new report? The current draft will be cleared.')) {
       localStorage.removeItem('cf_draft');
       location.reload();
     }
@@ -75,7 +85,12 @@ function getFormData(){
   return {
     caseId: window.CF_CASE_ID,
     date: new Date().toLocaleString(),
-    suspect: { name: val('sName'), phone: val('sPhone'), alt: val('sAltPhone'), pay: val('sPayment'), upi: val('sUpi'), crypto: val('sCrypto'), insta: val('sInsta'), tgUser: val('sTgUser'), tgId: val('sTgId'), social: val('sSocial'), other: val('sOther') },
+    suspect: {
+      photo: (window.Evidence && Evidence.photo) ? Evidence.photo.dataUrl : '',
+      name: val('sName'), phone: val('sPhone'), alt: val('sAltPhone'), pay: val('sPayment'),
+      upi: val('sUpi'), crypto: val('sCrypto'), insta: val('sInsta'), tgUser: val('sTgUser'),
+      tgId: val('sTgId'), social: val('sSocial'), other: val('sOther')
+    },
     crime: { type: val('cType'), platform: val('cPlatform'), date: val('cDate') ? new Date(val('cDate')).toLocaleString() : '', amount: val('cAmount') },
     desc: val('dText'),
     evidence: (window.Evidence ? Evidence.list : []),
@@ -90,16 +105,17 @@ function row(label, value, mono){
   return `<div class="rrow"><span class="rl">${label}</span><span class="rv ${mono ? 'mono' : ''}">${ml(value)}</span></div>`;
 }
 
-function buildReportHTML(d, dark){
+function buildReportHTML(d, black){
   const ex = d.evidence.map((e, i) =>
-    `<figure class="ex"><img src="${e.dataUrl}"><figcaption>Exhibit ${String.fromCharCode(65 + i)} · SHA-256: ${e.hash.slice(0, 16)}…</figcaption></figure>`
+    `<figure class="ex"><img src="${e.dataUrl}"><figcaption>Exhibit ${String.fromCharCode(65 + i)} - SHA-256: ${e.hash.slice(0, 16)}...</figcaption></figure>`
   ).join('');
   return `
-  <div class="sheet ${dark ? 'dark' : ''}">
-    <h1>CYBER CRIME EVIDENCE REPORT</h1>
+  <div class="sheet ${black ? 'black' : ''}">
+    <h1>Cyber Crime Evidence Report</h1>
     <div class="meta"><span>Case ID: <b>${d.caseId}</b></span><span>Generated: <b>${d.date}</b></span></div>
 
     <h2>Suspect Information</h2>
+    ${d.suspect.photo ? `<img class="photo" src="${d.suspect.photo}" alt="Suspect photograph">` : ''}
     ${row('Suspect / Accused Name', d.suspect.name)}
     ${row('Primary Phone Number', d.suspect.phone, 1)}
     ${row('Alternative Number', d.suspect.alt, 1)}
@@ -115,7 +131,7 @@ function buildReportHTML(d, dark){
     <h2>Crime Details</h2>
     ${row('Crime Type', d.crime.type)}
     ${row('Platform Used', d.crime.platform)}
-    ${row('Date & Time of Incident', d.crime.date)}
+    ${row('Date and Time of Incident', d.crime.date)}
     ${row('Amount Lost', d.crime.amount)}
 
     <h2>Description</h2>
@@ -129,28 +145,28 @@ function buildReportHTML(d, dark){
     ${row('Station / Department / Unit', d.officer.station) || '<div class="rrow"><span class="rl">Station / Department / Unit</span><span class="rv">____________________</span></div>'}
     ${row('Case Status', d.officer.status) || '<div class="rrow"><span class="rl">Case Status</span><span class="rv">Open / Under Investigation / Closed</span></div>'}
     ${row('Officer Remarks', d.officer.remarks)}
-    <div class="stamp">VERIFICATION & STAMP</div>
+    <div class="stamp">VERIFICATION AND STAMP</div>
 
     <h2>Declaration</h2>
-    <p class="desc">Main ghoshna karta/karti hoon ki is report mein di gayi jankari meri jankari mein sach hai. Yeh report cyber cell / police mein submit karne hetu taiyar ki gayi hai.</p>
+    <p class="desc">I declare that the information provided in this report is true to my knowledge. This report is prepared for submission to the cyber cell / police.</p>
     <div class="sig">
-      <span>Complainant: <b>${esc(d.decl.name)}</b>${d.decl.contact ? ' · ' + esc(d.decl.contact) : ''}</span>
+      <span>Complainant: <b>${esc(d.decl.name)}</b>${d.decl.contact ? ' - ' + esc(d.decl.contact) : ''}</span>
       <span>Signature: <span class="line"></span></span>
       <span>Date: <span class="line"></span></span>
     </div>
 
     <div id="qrBox" style="margin-top:10px"></div>
-    <div class="foot">${d.caseId} · Generated by CyberForce Case Report System · Citizen-prepared evidence summary — official action police/cyber cell ke adhikar kshetra mein hai · National Cyber Crime Helpline: 1930</div>
+    <div class="foot">${d.caseId} - Generated by CyberForce Case Report System - Citizen-prepared evidence summary. Official action lies with police / cyber cell jurisdiction. National Cyber Crime Helpline: 1930</div>
   </div>`;
 }
 
 /* ---- Live preview ---- */
 function renderPreview(){
-  const dark = document.querySelector('input[name="skin"]:checked').value === 'dark';
+  const black = document.querySelector('input[name="skin"]:checked').value === 'black';
   const d = getFormData();
   window.__CF_LAST_DATA = d;
   document.getElementById('caseIdView').textContent = d.caseId;
-  document.getElementById('reportPreview').innerHTML = buildReportHTML(d, dark);
+  document.getElementById('reportPreview').innerHTML = buildReportHTML(d, black);
   if (window.renderQR) window.renderQR(document.getElementById('qrBox'), d);
 }
 
