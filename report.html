@@ -15,46 +15,43 @@
     body[data-theme="dark"] #themeToggle{border-color:#fff;color:#fff}
     #photoPreview{width:110px;height:130px;object-fit:cover;border:1px solid #111;margin-top:8px}
     body[data-theme="dark"] #photoPreview{border-color:var(--accent)}
-
-    /* ---- PDF-SAFE SHEET: no stretch, no text overlap ---- */
-    .sheet .meta{display:block}
-    .sheet .meta span{display:inline-block;margin-right:18px}
-    .sheet .rrow{display:block;line-height:1.55}
-    .sheet .rl{display:inline;min-width:0;margin-right:6px}
+    /* PDF-safe sheet */
+    .sheet .meta{display:block}.sheet .meta span{display:inline-block;margin-right:18px}
+    .sheet .rrow{display:block;line-height:1.55}.sheet .rl{display:inline;min-width:0;margin-right:6px}
     .sheet .rv{display:inline;word-break:break-word}
-    .sheet .sig{display:block}
-    .sheet .sig span{display:block;margin-bottom:10px}
+    .sheet .sig{display:block}.sheet .sig > span{display:block;margin-bottom:10px}
     .sheet .stamp{display:block;line-height:90px;text-align:center}
-    .sheet .exgrid{display:block}
-    .sheet .ex{display:inline-block;vertical-align:top;margin:0 14px 14px 0;max-width:48%}
-    .sheet .ex img{display:block;margin:0 auto;width:auto;height:auto;max-width:100%}
-    .sheet .photo{width:auto;height:auto}
+    .sheet .exgrid{display:block}.sheet .ex{display:inline-block;vertical-align:top;margin:0 14px 14px 0;max-width:48%}
+    .sheet .ex img{display:block;margin:0 auto;border:1px solid #999;background:#fff}
+    .sheet .photo{float:right;margin:0 0 10px 14px;border:2px solid #0b2447;outline:1px solid #1d4ed8}
   </style>
 </head>
 <body data-theme="light">
 
   <header class="navbar">
-  <div class="nav-inner">
-    <a class="brand" href="index.html">
-      <img src="assets/logo.png" alt="CyberForce" class="brand-logo" onerror="this.style.display='none'">
-      <span class="brand-name">CYBER<em>FORCE</em></span>
-      <span class="brand-tag">Case Report System</span>
-    </a>
-    <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="report.html">Create Report</a>
-      <a href="verify.html">Verify</a>
-      <a href="my-reports.html">My Reports</a>
-      <a href="rules.html">Rules</a>
-    </nav>
-  </div>
-</header>
-<div class="portal-bar">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo.png" alt="CyberForce" class="brand-logo" onerror="this.style.display='none'">
+        <span class="brand-name">CYBER<em>FORCE</em></span>
+        <span class="brand-tag">Case Report System</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="report.html" class="active">Create Report</a>
+        <a href="verify.html">Verify</a>
+        <a href="my-reports.html">My Reports</a>
+        <a href="rules.html">Rules</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="portal-bar">
     <div class="container portal-inner">
       <span>CyberForce Secure Portal — Report Filing</span>
       <span class="portal-lock">Processed only on your device</span>
     </div>
   </div>
+
   <div class="container page-bar">
     <p class="overline">Official Report Builder</p>
     <button class="btn btn-line-b btn-small" id="themeToggle">Dark Mode</button>
@@ -62,7 +59,6 @@
 
   <main class="container">
     <div class="wizard">
-
       <aside>
         <ol class="wizard-steps">
           <li data-step="1" class="active"><span class="num">1</span>Suspect Information</li>
@@ -77,7 +73,6 @@
 
       <section class="wizard-panel">
 
-        <!-- STEP 1 -->
         <div class="step-panel show" data-step="1">
           <h2 class="panel-title">Suspect Information</h2>
           <p class="panel-sub">Fill in whatever details you have. Blank fields are skipped in the final report.</p>
@@ -103,22 +98,15 @@
           <div class="field"><label>Social Media Accounts (all)</label><textarea id="sSocial" rows="3" placeholder="Facebook, X, Snapchat, YouTube..."></textarea></div>
         </div>
 
-        <!-- STEP 2 -->
         <div class="step-panel" data-step="2">
           <h2 class="panel-title">Crime Details</h2>
           <p class="panel-sub">Basic information about the incident.</p>
           <div class="grid-2">
             <div class="field"><label>Crime Type</label>
-              <select id="cType">
-                <option>Fraud</option><option>Phishing</option><option>Blackmail / Sextortion</option>
-                <option>Job Scam</option><option>Identity Theft</option><option>Other</option>
-              </select>
+              <select id="cType"><option>Fraud</option><option>Phishing</option><option>Blackmail / Sextortion</option><option>Job Scam</option><option>Identity Theft</option><option>Other</option></select>
             </div>
             <div class="field"><label>Platform Used</label>
-              <select id="cPlatform">
-                <option>Call</option><option>WhatsApp</option><option>Telegram</option>
-                <option>Instagram</option><option>Website</option><option>Other</option>
-              </select>
+              <select id="cPlatform"><option>Call</option><option>WhatsApp</option><option>Telegram</option><option>Instagram</option><option>Website</option><option>Other</option></select>
             </div>
           </div>
           <div class="grid-2">
@@ -127,7 +115,6 @@
           </div>
         </div>
 
-        <!-- STEP 3 -->
         <div class="step-panel" data-step="3">
           <h2 class="panel-title">Description</h2>
           <p class="panel-sub">Guided format: what happened, how it happened, the loss, and what was demanded.</p>
@@ -135,19 +122,17 @@
           <p class="panel-sub"><span id="wordCount">0 words</span></p>
         </div>
 
-        <!-- STEP 4 -->
         <div class="step-panel" data-step="4">
           <h2 class="panel-title">Evidence</h2>
-          <p class="panel-sub">Upload screenshots. Each file receives an Exhibit label and a SHA-256 integrity hash.</p>
+          <p class="panel-sub">Upload screenshots. A Crop & Zoom editor will open — set the image and press SAVE. Each exhibit gets a SHA-256 hash.</p>
           <div class="dropzone" id="dropzone">Click or drag and drop screenshots here</div>
           <input type="file" id="fileInput" accept="image/*" multiple hidden>
           <div class="exhibit-grid" id="exhibitGrid"></div>
         </div>
 
-        <!-- STEP 5 -->
         <div class="step-panel" data-step="5">
           <h2 class="panel-title">Officer Use</h2>
-          <p class="panel-sub">Optional for the complainant. This section is completed by the investigating officer after submission. If left empty, blank lines appear in the report.</p>
+          <p class="panel-sub">Optional for the complainant. Completed by the investigating officer after submission.</p>
           <div class="grid-2">
             <div class="field"><label>Received By (Officer Name / ID)</label><input id="oReceived" type="text"></div>
             <div class="field"><label>Station / Department / Unit</label><input id="oStation" type="text"></div>
@@ -158,7 +143,6 @@
           <div class="field"><label>Officer Remarks</label><textarea id="oRemarks" rows="3"></textarea></div>
         </div>
 
-        <!-- STEP 6 -->
         <div class="step-panel" data-step="6">
           <h2 class="panel-title">Declaration</h2>
           <div class="field"><label>Complainant Name *</label><input id="dName" type="text"></div>
@@ -171,7 +155,6 @@
           </div>
         </div>
 
-        <!-- STEP 7 -->
         <div class="step-panel" data-step="7">
           <h2 class="panel-title">Export</h2>
           <p class="panel-sub">Case ID: <b id="caseIdView">—</b></p>
@@ -199,18 +182,382 @@
     <div class="foot-bottom">© 2026 CyberForce Case Report System. For education and documentation only.</div>
   </footer>
 
-  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 
-  <!-- App scripts -->
-  <script src="js/tracker.js"></script>
-  <script src="js/evidence.js"></script>
-  <script src="js/caseid.js"></script>
-  <script src="js/wizard.js"></script>
-  <script src="js/export-pdf.js"></script>
-  <script src="js/export-docx.js"></script>
+  <script>
+  /* ================= CONFIG ================= */
+  window.CF_SITE_URL = 'https://cyberforcereport.netlify.app'; // apna Netlify URL (QR ke liye)
+  window.CF_SHEET_URL = ''; // Apps Script URL (tracking, optional)
+
+  /* ================= TRACKER ================= */
+  window.CF_TRACK = function(event, label){
+    if (!window.CF_SHEET_URL) return;
+    try { fetch(window.CF_SHEET_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({ e:event, l:label||'', t:Date.now(), v:'1.0' }) }); } catch(e){}
+  };
+
+  /* ================= CASE ID + QR + META ================= */
+  window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+  function verifyLink(d){
+    const id = d.caseId || window.CF_CASE_ID;
+    return window.CF_SITE_URL ? (window.CF_SITE_URL + '/verify.html?id=' + encodeURIComponent(id)) : ('CyberForce Case ' + id + ' | Generated ' + d.date);
+  }
+  window.renderQR = function(box, d){
+    if (!box || !window.QRCode) return;
+    box.innerHTML = '';
+    new QRCode(box, { text: verifyLink(d), width: 84, height: 84, correctLevel: QRCode.CorrectLevel.M });
+    const c = document.createElement('div');
+    c.style.fontSize = '10px'; c.style.marginTop = '4px';
+    c.textContent = 'Scan: ' + d.caseId;
+    box.appendChild(c);
+  };
+  window.saveReportMeta = function(d){
+    try {
+      const l = JSON.parse(localStorage.getItem('cf_reports') || '[]');
+      l.unshift({ caseId: d.caseId, date: d.date, suspect: d.suspect.name, type: d.crime.type });
+      localStorage.setItem('cf_reports', JSON.stringify(l));
+    } catch(e){}
+  };
+
+  /* ================= HELPERS ================= */
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const ml = s => esc(s).replace(/\n/g,'<br>');
+  function fitSize(w, h, maxW, maxH){
+    const s = Math.min(maxW / (w || 1), maxH / (h || 1), 1);
+    return { w: Math.max(40, Math.round((w || 1) * s)), h: Math.max(40, Math.round((h || 1) * s)) };
+  }
+  function readDataURL(f){ return new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); }); }
+  function readSize(dataUrl){ return new Promise(res => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.src = dataUrl; }); }
+  async function hashDataUrl(dataUrl){
+    try {
+      const bin = atob(dataUrl.split(',')[1]);
+      const bytes = new Uint8Array(bin.length);
+      for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
+      const d = await crypto.subtle.digest('SHA-256', bytes);
+      return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2,'0')).join('');
+    } catch(e) { return 'hash-unavailable'; }
+  }
+
+  /* ================= CROP + ZOOM EDITOR ================= */
+  function openEditor(srcUrl, frameW, frameH, onSave, onCancel){
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#111;border:1px solid #333;border-radius:6px;padding:16px;max-width:92vw;text-align:center;color:#eee';
+    box.innerHTML =
+      '<div style="font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">Crop & Zoom — drag image to adjust</div>' +
+      '<canvas id="cfEdCanvas" style="border:1px solid #444;background:#000;touch-action:none;max-width:80vw"></canvas>' +
+      '<div style="margin:12px 0;display:flex;align-items:center;gap:10px;justify-content:center"><span style="font-size:.72rem">ZOOM</span><input id="cfEdZoom" type="range" min="100" max="300" value="100" style="width:180px"></div>' +
+      '<div style="display:flex;gap:10px;justify-content:center"><button id="cfEdSave" style="background:#1d4ed8;color:#fff;border:none;padding:10px 24px;cursor:pointer;font-weight:700">SAVE</button><button id="cfEdCancel" style="background:transparent;color:#eee;border:1px solid #555;padding:10px 24px;cursor:pointer">CANCEL</button></div>';
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+    const canvas = box.querySelector('#cfEdCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = frameW; canvas.height = frameH;
+    const zoomIn = box.querySelector('#cfEdZoom');
+    const img = new Image();
+    const st = { zoom: 1, x: 0, y: 0, base: 1, ready: false };
+    img.onload = () => { st.base = Math.max(frameW / img.width, frameH / img.height); st.ready = true; draw(); };
+    img.src = srcUrl;
+    function clampPan(){
+      const s = st.base * st.zoom;
+      const maxX = Math.max(0, (img.width * s - frameW) / 2);
+      const maxY = Math.max(0, (img.height * s - frameH) / 2);
+      st.x = Math.min(maxX, Math.max(-maxX, st.x));
+      st.y = Math.min(maxY, Math.max(-maxY, st.y));
+    }
+    function draw(){
+      if (!st.ready) return;
+      clampPan();
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, frameW, frameH);
+      const s = st.base * st.zoom;
+      const w = img.width * s, h = img.height * s;
+      ctx.drawImage(img, (frameW - w) / 2 + st.x, (frameH - h) / 2 + st.y, w, h);
+    }
+    zoomIn.addEventListener('input', () => { st.zoom = zoomIn.value / 100; draw(); });
+    let drag = null;
+    canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, ox: st.x, oy: st.y }; canvas.setPointerCapture(e.pointerId); });
+    canvas.addEventListener('pointermove', e => { if (!drag) return; st.x = drag.ox + (e.clientX - drag.x); st.y = drag.oy + (e.clientY - drag.y); draw(); });
+    ['pointerup','pointercancel'].forEach(ev => canvas.addEventListener(ev, () => drag = null));
+    box.querySelector('#cfEdSave').addEventListener('click', () => { const out = canvas.toDataURL('image/png'); document.body.removeChild(ov); onSave(out, frameW, frameH); });
+    box.querySelector('#cfEdCancel').addEventListener('click', () => { document.body.removeChild(ov); if (onCancel) onCancel(); });
+  }
+
+  /* ================= EVIDENCE ================= */
+  window.Evidence = { list: [], photo: null };
+  const dz = document.getElementById('dropzone');
+  const fi = document.getElementById('fileInput');
+  const grid = document.getElementById('exhibitGrid');
+  dz.addEventListener('click', () => fi.click());
+  ['dragover','dragenter'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
+  dz.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+  fi.addEventListener('change', () => { handleFiles(fi.files); fi.value = ''; });
+
+  async function handleFiles(files){
+    for (const f of files) {
+      if (!f.type.startsWith('image/')) continue;
+      if (f.size > 8 * 1024 * 1024) { alert('File must be under 8MB: ' + f.name); continue; }
+      if (Evidence.list.length >= 12) { alert('Maximum 12 exhibits allowed.'); break; }
+      const raw = await readDataURL(f);
+      const edited = await new Promise(res => openEditor(raw, 330, 430, (url, w, h) => res({ url, w, h }), () => res(null)));
+      if (!edited) continue;
+      const hash = await hashDataUrl(edited.url);
+      Evidence.list.push({ name: f.name, dataUrl: edited.url, hash, w: edited.w, h: edited.h });
+      renderExhibits();
+    }
+  }
+
+  document.getElementById('sPhoto').addEventListener('change', async function(){
+    const f = this.files[0];
+    if (!f || !f.type.startsWith('image/')) return;
+    if (f.size > 8 * 1024 * 1024) { alert('Photo must be under 8MB.'); this.value = ''; return; }
+    const raw = await readDataURL(f);
+    openEditor(raw, 240, 280, (url, w, h) => {
+      Evidence.photo = { dataUrl: url, w, h };
+      const pv = document.getElementById('photoPreview');
+      pv.src = url; pv.style.display = 'block';
+    }, () => {});
+  });
+
+  function renderExhibits(){
+    grid.innerHTML = Evidence.list.map((e, i) => `
+      <div class="exhibit">
+        <img src="${e.dataUrl}" alt="Exhibit ${String.fromCharCode(65 + i)}">
+        <div class="tag">Exhibit ${String.fromCharCode(65 + i)}</div>
+        <div class="hash">${e.hash.slice(0, 18)}...</div>
+        <button class="rm" data-i="${i}">Remove</button>
+      </div>`).join('');
+    grid.querySelectorAll('.rm').forEach(b => b.addEventListener('click', () => { Evidence.list.splice(+b.dataset.i, 1); renderExhibits(); }));
+  }
+
+  /* ================= THEME ================= */
+  const themeBtn = document.getElementById('themeToggle');
+  function applyTheme(t){ document.body.dataset.theme = t; localStorage.setItem('cf_theme', t); themeBtn.textContent = (t === 'dark') ? 'Light Mode' : 'Dark Mode'; }
+  applyTheme(localStorage.getItem('cf_theme') || 'light');
+  themeBtn.addEventListener('click', () => applyTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+  /* ================= WIZARD ================= */
+  let current = 1, startedTracked = false;
+  const FIELD_IDS = ['sName','sPhone','sAltPhone','sPayment','sUpi','sCrypto','sInsta','sTgUser','sTgId','sOther','sSocial','cType','cPlatform','cDate','cAmount','dText','oReceived','oStation','oStatus','oRemarks','dName','dContact'];
+
+  function showStep(n){
+    current = n;
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.toggle('show', +p.dataset.step === n));
+    document.querySelectorAll('.wizard-steps li').forEach(li => li.classList.toggle('active', +li.dataset.step === n));
+    document.getElementById('btnBack').style.visibility = (n === 1) ? 'hidden' : 'visible';
+    document.getElementById('btnNext').textContent = (n === 6) ? 'Preview and Export' : (n === 7 ? 'Finish' : 'Next Section');
+    if (n === 7) renderPreview();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  document.getElementById('btnNext').addEventListener('click', () => {
+    if (current === 1 && !startedTracked) { CF_TRACK('report_started'); startedTracked = true; }
+    if (current === 6) {
+      if (!val('dName') || !document.getElementById('declCheck').checked) { alert('Complete the declaration: Complainant Name and the truth checkbox are required.'); return; }
+      CF_TRACK('report_completed', val('cType'));
+    }
+    if (current === 7) {
+      if (confirm('Start a new report? All data will be cleared.')) { localStorage.removeItem('cf_draft'); location.reload(); }
+      return;
+    }
+    showStep(current + 1);
+  });
+  document.getElementById('btnBack').addEventListener('click', () => showStep(Math.max(1, current - 1)));
+  document.querySelectorAll('.wizard-steps li').forEach(li => li.addEventListener('click', () => { const t = +li.dataset.step; if (t <= current) showStep(t); }));
+
+  /* Auto-clear after export */
+  ['btnPdf','btnDoc'].forEach(id => document.getElementById(id).addEventListener('click', () => {
+    setTimeout(() => { localStorage.removeItem('cf_draft'); if (confirm('Report downloaded. Clear all data and start a NEW report?')) location.reload(); }, 1200);
+  }));
+
+  document.getElementById('dText').addEventListener('input', () => { const t = val('dText'); document.getElementById('wordCount').textContent = (t ? t.split(/\s+/).length : 0) + ' words'; });
+  document.addEventListener('input', e => { if (e.target.matches('input,textarea,select')) saveDraft(); });
+  function saveDraft(){ const o = {}; FIELD_IDS.forEach(id => o[id] = val(id)); o.declCheck = document.getElementById('declCheck').checked; try { localStorage.setItem('cf_draft', JSON.stringify(o)); } catch(e){} }
+  function loadDraft(){ try { const o = JSON.parse(localStorage.getItem('cf_draft') || '{}'); FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el && o[id]) el.value = o[id]; }); if (o.declCheck) document.getElementById('declCheck').checked = true; document.getElementById('dText').dispatchEvent(new Event('input')); } catch(e){} }
+
+  function getFormData(){
+    const ph = Evidence.photo;
+    return {
+      caseId: window.CF_CASE_ID, date: new Date().toLocaleString(),
+      suspect: { photo: ph ? ph.dataUrl : '', photoW: ph ? ph.w : 0, photoH: ph ? ph.h : 0, name: val('sName'), phone: val('sPhone'), alt: val('sAltPhone'), pay: val('sPayment'), upi: val('sUpi'), crypto: val('sCrypto'), insta: val('sInsta'), tgUser: val('sTgUser'), tgId: val('sTgId'), social: val('sSocial'), other: val('sOther') },
+      crime: { type: val('cType'), platform: val('cPlatform'), date: val('cDate') ? new Date(val('cDate')).toLocaleString() : '', amount: val('cAmount') },
+      desc: val('dText'), evidence: Evidence.list,
+      officer: { received: val('oReceived'), station: val('oStation'), status: val('oStatus'), remarks: val('oRemarks') },
+      decl: { name: val('dName'), contact: val('dContact') }
+    };
+  }
+
+  function row(label, value, mono){ if (!value) return ''; return `<div class="rrow"><span class="rl">${label}:</span> <span class="rv ${mono ? 'mono' : ''}">${ml(value)}</span></div>`; }
+
+  function buildReportHTML(d, black){
+    const ex = d.evidence.map((e, i) => {
+      const sz = fitSize(e.w, e.h, 330, 430);
+      return `<figure class="ex"><img src="${e.dataUrl}" style="width:${sz.w}px;height:${sz.h}px"><figcaption>Exhibit ${String.fromCharCode(65 + i)} - SHA-256: ${e.hash.slice(0, 16)}...</figcaption></figure>`;
+    }).join('');
+    const ph = d.suspect.photo ? fitSize(d.suspect.photoW, d.suspect.photoH, 120, 140) : null;
+    return `
+    <div class="sheet ${black ? 'black' : ''}">
+      <h1>Cyber Crime Evidence Report</h1>
+      <div class="meta"><span>Case ID: <b>${d.caseId}</b></span><span>Generated: <b>${d.date}</b></span></div>
+      ${d.suspect.name ? `<p class="subj">Complaint against: <b>${esc(d.suspect.name)}</b></p>` : ''}
+      <h2>Suspect Information</h2>
+      ${d.suspect.photo && ph ? `<img class="photo" src="${d.suspect.photo}" style="width:${ph.w}px;height:${ph.h}px" alt="Suspect photograph">` : ''}
+      ${row('Suspect / Accused Name', d.suspect.name)}
+      ${row('Primary Phone Number', d.suspect.phone, 1)}
+      ${row('Alternative Number', d.suspect.alt, 1)}
+      ${row('Payment Methods', d.suspect.pay, 1)}
+      ${row('UPI ID', d.suspect.upi, 1)}
+      ${row('Crypto Wallet Address', d.suspect.crypto, 1)}
+      ${row('Instagram Username', d.suspect.insta)}
+      ${row('Telegram Username', d.suspect.tgUser)}
+      ${row('Telegram ID', d.suspect.tgId, 1)}
+      ${row('Social Media Accounts', d.suspect.social)}
+      ${row('Other (Email / Website / App)', d.suspect.other)}
+      <h2>Crime Details</h2>
+      ${row('Crime Type', d.crime.type)}
+      ${row('Platform Used', d.crime.platform)}
+      ${row('Date and Time of Incident', d.crime.date)}
+      ${row('Amount Lost', d.crime.amount)}
+      <h2>Description</h2>
+      <p class="desc">${esc(d.desc) || '—'}</p>
+      <h2>Evidence</h2>
+      ${ex ? `<div class="exgrid">${ex}</div>` : '<p class="desc">No evidence attached.</p>'}
+      <h2>Officer Use</h2>
+      ${row('Received By (Name / ID)', d.officer.received) || '<div class="rrow"><span class="rl">Received By (Name / ID):</span> <span class="rv">____________________</span></div>'}
+      ${row('Station / Department / Unit', d.officer.station) || '<div class="rrow"><span class="rl">Station / Department / Unit:</span> <span class="rv">____________________</span></div>'}
+      ${row('Case Status', d.officer.status) || '<div class="rrow"><span class="rl">Case Status:</span> <span class="rv">Open / Under Investigation / Closed</span></div>'}
+      ${row('Officer Remarks', d.officer.remarks)}
+      <div class="stamp">VERIFICATION AND STAMP</div>
+      <h2>Declaration</h2>
+      <p class="desc">I declare that the information provided in this report is true to my knowledge. This report is prepared for submission to the cyber cell / police.</p>
+      <div class="sig">
+        <span>Complainant: <b>${esc(d.decl.name)}</b>${d.decl.contact ? ' - ' + esc(d.decl.contact) : ''}</span>
+        <span>Signature: <span class="line"></span></span>
+        <span>Date: <span class="line"></span></span>
+      </div>
+      <div id="qrBox" style="margin-top:10px"></div>
+      <div class="foot">${d.caseId} - Generated by CyberForce Case Report System - Citizen-prepared evidence summary. Official action lies with police / cyber cell jurisdiction. National Cyber Crime Helpline: 1930</div>
+    </div>`;
+  }
+
+  function renderPreview(){
+    const black = document.querySelector('input[name="skin"]:checked').value === 'black';
+    const d = getFormData();
+    window.__CF_LAST_DATA = d;
+    document.getElementById('caseIdView').textContent = d.caseId;
+    document.getElementById('reportPreview').innerHTML = buildReportHTML(d, black);
+    if (window.renderQR) window.renderQR(document.getElementById('qrBox'), d);
+  }
+  document.querySelectorAll('input[name="skin"]').forEach(r => r.addEventListener('change', renderPreview));
+  document.getElementById('btnPrint').addEventListener('click', () => { CF_TRACK('print'); window.print(); });
+
+  /* ================= PDF EXPORT (safe cuts, no stretch) ================= */
+  document.getElementById('btnPdf').addEventListener('click', async () => {
+    const btn = document.getElementById('btnPdf');
+    const sheet = document.querySelector('#reportPreview .sheet');
+    if (!sheet) { alert('Generate the preview first.'); return; }
+    btn.disabled = true; btn.textContent = 'Generating...';
+    try {
+      const dark = sheet.classList.contains('black');
+      const canvas = await html2canvas(sheet, { scale: 3, backgroundColor: dark ? '#000000' : '#ffffff', useCORS: true });
+      const ctx = canvas.getContext('2d');
+      const bgPx = ctx.getImageData(2, 2, 1, 1).data;
+      function inkScore(y){ const data = ctx.getImageData(0, y, canvas.width, 1).data; let s = 0; for (let x = 0; x < canvas.width; x += 6) { const i = x * 4; if (Math.abs(data[i]-bgPx[0]) + Math.abs(data[i+1]-bgPx[1]) + Math.abs(data[i+2]-bgPx[2]) > 90) s++; } return s; }
+      function safeCut(from, to){ let best = to, bs = Infinity; for (let y = from; y <= to; y += 3) { const s = inkScore(y); if (s < bs) { bs = s; best = y; } } return best; }
+      const pxPerMm = canvas.width / 210;
+      const pagePx = Math.floor(297 * pxPerMm);
+      const pages = [];
+      let y = 0;
+      while (y < canvas.height) {
+        let end = Math.min(y + pagePx, canvas.height);
+        if (end < canvas.height) end = safeCut(y + Math.floor(pagePx * 0.80), y + pagePx - 2);
+        const pc = document.createElement('canvas');
+        pc.width = canvas.width; pc.height = end - y;
+        pc.getContext('2d').drawImage(canvas, 0, y, canvas.width, end - y, 0, 0, canvas.width, end - y);
+        pages.push(pc); y = end;
+      }
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      pages.forEach((pc, i) => { if (i > 0) pdf.addPage(); pdf.addImage(pc.toDataURL('image/png'), 'PNG', 0, 0, 210, pc.height / pxPerMm); });
+      if (window.__CF_LAST_DATA) { saveReportMeta(window.__CF_LAST_DATA); CF_TRACK('export_pdf', window.__CF_LAST_DATA.crime.type); }
+      pdf.save(window.CF_CASE_ID + '-evidence-report.pdf');
+    } catch (e) { alert('PDF export failed: ' + e.message); }
+    btn.disabled = false; btn.textContent = 'Download PDF';
+  });
+
+  /* ================= DOCX EXPORT (complete, no missing parts) ================= */
+  document.getElementById('btnDoc').addEventListener('click', async () => {
+    const d = window.__CF_LAST_DATA;
+    if (!d) { alert('Generate the preview first.'); return; }
+    const btn = document.getElementById('btnDoc');
+    btn.disabled = true; btn.textContent = 'Generating...';
+    try {
+      const { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel } = window.docx;
+      const P = (text, o = {}) => new Paragraph({ children: [new TextRun({ text, bold: o.bold, size: o.size, color: o.color, italics: o.italics })], spacing: { after: o.after ?? 120 } });
+      const H = t => new Paragraph({ text: t, heading: HeadingLevel.HEADING_2, spacing: { before: 220, after: 100 } });
+      const row = (l, v) => v ? new Paragraph({ children: [new TextRun({ text: l + ': ', bold: true }), new TextRun({ text: v })], spacing: { after: 80 } }) : null;
+      const add = (l, v) => { const r = row(l, v); if (r) children.push(r); };
+      async function imgRun(dataUrl, maxW, w, h){
+        const sz = (w && h) ? { w, h } : await readSize(dataUrl);
+        const s = Math.min(maxW / sz.w, 1);
+        const bin = atob(dataUrl.split(',')[1]);
+        const bytes = new Uint8Array(bin.length);
+        for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
+        return new Paragraph({ children: [new ImageRun({ type: 'png', data: bytes, transformation: { width: Math.round(sz.w * s), height: Math.round(sz.h * s) } })], spacing: { after: 120 } });
+      }
+      const children = [];
+      children.push(new Paragraph({ children: [new TextRun({ text: 'CYBER CRIME EVIDENCE REPORT', bold: true, size: 32 })], spacing: { after: 120 } }));
+      children.push(P('CyberForce Case Report System', { size: 18, color: '0b2447' }));
+      children.push(P('Case ID: ' + d.caseId + '   |   Generated: ' + d.date, { size: 20 }));
+      if (d.suspect.name) children.push(P('Complaint against: ' + d.suspect.name, { bold: true }));
+      children.push(H('Suspect Information'));
+      if (d.suspect.photo) { try { children.push(await imgRun(d.suspect.photo, 110, d.suspect.photoW, d.suspect.photoH)); children.push(P('Suspect Photograph', { italics: true, size: 16 })); } catch(e){} }
+      add('Suspect / Accused Name', d.suspect.name); add('Primary Phone Number', d.suspect.phone);
+      add('Alternative Number', d.suspect.alt); add('Payment Methods', d.suspect.pay);
+      add('UPI ID', d.suspect.upi); add('Crypto Wallet Address', d.suspect.crypto);
+      add('Instagram Username', d.suspect.insta); add('Telegram Username', d.suspect.tgUser);
+      add('Telegram ID', d.suspect.tgId); add('Social Media Accounts', d.suspect.social);
+      add('Other (Email / Website / App)', d.suspect.other);
+      children.push(H('Crime Details'));
+      add('Crime Type', d.crime.type); add('Platform Used', d.crime.platform);
+      add('Date and Time of Incident', d.crime.date); add('Amount Lost', d.crime.amount);
+      children.push(H('Description'));
+      children.push(P(d.desc || '—'));
+      children.push(H('Evidence'));
+      if (!d.evidence.length) children.push(P('No evidence attached.'));
+      for (let i = 0; i < d.evidence.length; i++) {
+        const e = d.evidence[i];
+        children.push(new Paragraph({ children: [new TextRun({ text: 'Exhibit ' + String.fromCharCode(65 + i) + ' - SHA-256: ' + e.hash.slice(0, 16) + '...', bold: true, size: 18 })], spacing: { after: 60 } }));
+        try { children.push(await imgRun(e.dataUrl, 320, e.w, e.h)); } catch(err){}
+      }
+      children.push(H('Officer Use'));
+      children.push(row('Received By (Name / ID)', d.officer.received) || P('Received By (Name / ID): ____________________'));
+      children.push(row('Station / Department / Unit', d.officer.station) || P('Station / Department / Unit: ____________________'));
+      children.push(row('Case Status', d.officer.status) || P('Case Status: Open / Under Investigation / Closed'));
+      if (d.officer.remarks) add('Officer Remarks', d.officer.remarks);
+      children.push(P('Verification and Stamp: ____________________', { after: 80 }));
+      children.push(H('Declaration'));
+      children.push(P('I declare that the information provided in this report is true to my knowledge. This report is prepared for submission to the cyber cell / police.'));
+      children.push(P('Complainant: ' + d.decl.name + (d.decl.contact ? ' - ' + d.decl.contact : '')));
+      children.push(P('Signature: ____________________    Date: ____________________'));
+      children.push(P(d.caseId + ' - Generated by CyberForce Case Report System - National Cyber Crime Helpline: 1930', { size: 16, color: '666666' }));
+      const doc = new Document({ sections: [{ children }] });
+      const blob = await Packer.toBlob(doc);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = window.CF_CASE_ID + '-evidence-report.docx';
+      a.click();
+      saveReportMeta(d); CF_TRACK('export_docx', d.crime.type);
+    } catch (e) { alert('DOC export failed: ' + e.message); }
+    btn.disabled = false; btn.textContent = 'Download DOC';
+  });
+
+  /* ================= INIT ================= */
+  loadDraft();
+  showStep(1);
+  </script>
 </body>
 </html>
