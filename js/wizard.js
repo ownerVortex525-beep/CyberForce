@@ -1,4 +1,4 @@
-/* ============ CyberForce Wizard Logic (v5 — Complete) ============ */
+/* ============ CyberForce Wizard Logic (v6 — PDF-safe images) ============ */
 let current = 1;
 let startedTracked = false;
 window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -9,7 +9,13 @@ const val = id => { const el = document.getElementById(id); return el ? el.value
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const ml = s => esc(s).replace(/\n/g,'<br>');
 
-/* ---- Theme toggle (Dark / Light) ---- */
+/* Image ko original ratio mein fit karo — kabhi stretch nahi */
+function fitSize(w, h, maxW, maxH){
+  const s = Math.min(maxW / (w || 1), maxH / (h || 1), 1);
+  return { w: Math.max(40, Math.round((w || 1) * s)), h: Math.max(40, Math.round((h || 1) * s)) };
+}
+
+/* ---- Theme toggle ---- */
 const themeBtn = document.getElementById('themeToggle');
 function applyTheme(t){
   document.body.dataset.theme = t;
@@ -82,11 +88,12 @@ function loadDraft(){
 
 /* ---- Data collection ---- */
 function getFormData(){
+  const ph = (window.Evidence && Evidence.photo) ? Evidence.photo : null;
   return {
     caseId: window.CF_CASE_ID,
     date: new Date().toLocaleString(),
     suspect: {
-      photo: (window.Evidence && Evidence.photo) ? Evidence.photo.dataUrl : '',
+      photo: ph ? ph.dataUrl : '', photoW: ph ? ph.w : 0, photoH: ph ? ph.h : 0,
       name: val('sName'), phone: val('sPhone'), alt: val('sAltPhone'), pay: val('sPayment'),
       upi: val('sUpi'), crypto: val('sCrypto'), insta: val('sInsta'), tgUser: val('sTgUser'),
       tgId: val('sTgId'), social: val('sSocial'), other: val('sOther')
@@ -99,16 +106,18 @@ function getFormData(){
   };
 }
 
-/* ---- Report sheet builder ---- */
+/* ---- Report sheet builder (PDF-safe block layout + exact image sizes) ---- */
 function row(label, value, mono){
   if (!value) return '';
-  return `<div class="rrow"><span class="rl">${label}</span><span class="rv ${mono ? 'mono' : ''}">${ml(value)}</span></div>`;
+  return `<div class="rrow"><span class="rl">${label}:</span> <span class="rv ${mono ? 'mono' : ''}">${ml(value)}</span></div>`;
 }
 
 function buildReportHTML(d, black){
-  const ex = d.evidence.map((e, i) =>
-    `<figure class="ex"><img src="${e.dataUrl}"><figcaption>Exhibit ${String.fromCharCode(65 + i)} - SHA-256: ${e.hash.slice(0, 16)}...</figcaption></figure>`
-  ).join('');
+  const ex = d.evidence.map((e, i) => {
+    const sz = fitSize(e.w, e.h, 330, 430);
+    return `<figure class="ex"><img src="${e.dataUrl}" style="width:${sz.w}px;height:${sz.h}px"><figcaption>Exhibit ${String.fromCharCode(65 + i)} - SHA-256: ${e.hash.slice(0, 16)}...</figcaption></figure>`;
+  }).join('');
+  const ph = d.suspect.photo ? fitSize(d.suspect.photoW, d.suspect.photoH, 120, 140) : null;
   return `
   <div class="sheet ${black ? 'black' : ''}">
     <h1>Cyber Crime Evidence Report</h1>
@@ -116,7 +125,7 @@ function buildReportHTML(d, black){
     ${d.suspect.name ? `<p class="subj">Complaint against: <b>${esc(d.suspect.name)}</b></p>` : ''}
 
     <h2>Suspect Information</h2>
-    ${d.suspect.photo ? `<img class="photo" src="${d.suspect.photo}" alt="Suspect photograph">` : ''}
+    ${d.suspect.photo && ph ? `<img class="photo" src="${d.suspect.photo}" style="width:${ph.w}px;height:${ph.h}px" alt="Suspect photograph">` : ''}
     ${row('Suspect / Accused Name', d.suspect.name)}
     ${row('Primary Phone Number', d.suspect.phone, 1)}
     ${row('Alternative Number', d.suspect.alt, 1)}
@@ -142,9 +151,9 @@ function buildReportHTML(d, black){
     ${ex ? `<div class="exgrid">${ex}</div>` : '<p class="desc">No evidence attached.</p>'}
 
     <h2>Officer Use</h2>
-    ${row('Received By (Name / ID)', d.officer.received) || '<div class="rrow"><span class="rl">Received By (Name / ID)</span><span class="rv">____________________</span></div>'}
-    ${row('Station / Department / Unit', d.officer.station) || '<div class="rrow"><span class="rl">Station / Department / Unit</span><span class="rv">____________________</span></div>'}
-    ${row('Case Status', d.officer.status) || '<div class="rrow"><span class="rl">Case Status</span><span class="rv">Open / Under Investigation / Closed</span></div>'}
+    ${row('Received By (Name / ID)', d.officer.received) || '<div class="rrow"><span class="rl">Received By (Name / ID):</span> <span class="rv">____________________</span></div>'}
+    ${row('Station / Department / Unit', d.officer.station) || '<div class="rrow"><span class="rl">Station / Department / Unit:</span> <span class="rv">____________________</span></div>'}
+    ${row('Case Status', d.officer.status) || '<div class="rrow"><span class="rl">Case Status:</span> <span class="rv">Open / Under Investigation / Closed</span></div>'}
     ${row('Officer Remarks', d.officer.remarks)}
     <div class="stamp">VERIFICATION AND STAMP</div>
 
