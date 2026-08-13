@@ -1,0 +1,125 @@
+/* ============ CyberForce Design System (Final v2) ============ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700&display=swap');
+
+:root{
+  --bg:#0d1218;
+  --bg-soft:#121a23;
+  --card:#161f2a;
+  --border:#263140;
+  --text:#eef2f6;
+  --muted:#93a1b3;
+  --accent:#35c9e3;      /* cyan — sirf brand/active */
+  --primary:#1d4ed8;
+  --primary-hover:#1e40af;
+  --navy:#0f2a4a;
+  --danger:#b91c1c;
+  --radius:8px;
+  --maxw:1120px;
+  --font-body:'Inter','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-head:'Rajdhani','Segoe UI',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.6}
+h1,h2,h3{font-family:var(--font-head)}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+/* ---------- Navbar + Brand Name (Best Font & Style) ---------- */
+.navbar{position:sticky;top:0;background:rgba(13,18,24,.96);border-bottom:1px solid var(--border);z-index:50;backdrop-filter:blur(6px)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;max-width:var(--maxw);margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:38px;height:38px;border-radius:8px;object-fit:cover}
+.brand-name{font-family:var(--font-head);font-weight:700;font-size:1.35rem;letter-spacing:.8px;text-transform:uppercase}
+.brand-name .bf{color:var(--accent)}
+.brand-tag{color:var(--muted);font-size:.78rem;border-left:1px solid var(--border);padding-left:10px;letter-spacing:.4px}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{padding:8px 12px;border-radius:6px;color:var(--muted);font-size:.92rem;font-weight:500}
+.nav-links a:hover{color:var(--text);background:var(--card)}
+.nav-links a.active{color:var(--text);background:var(--card);border:1px solid var(--border)}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-block;padding:12px 22px;border-radius:6px;font-weight:600;font-size:.95rem;border:1px solid transparent;cursor:pointer;font-family:var(--font-body)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-secondary{background:transparent;color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- Hero ---------- */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:70px 0 50px}
+.hero h1{font-size:2.9rem;line-height:1.1;font-weight:700;letter-spacing:.3px}
+.hero .accent{color:var(--accent)}
+.lead{color:var(--muted);margin:18px 0 26px;font-size:1.05rem;max-width:560px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-points{margin-top:26px;list-style:none;color:var(--muted);font-size:.93rem;display:grid;gap:8px}
+.hero-points li::before{content:"✓ ";color:var(--accent);font-weight:700}
+.hero-art img{border-radius:12px;border:1px solid var(--border)}
+
+/* ---------- Sections ---------- */
+section{padding:46px 0}
+.section-title{font-size:1.7rem;margin-bottom:8px;font-weight:700;letter-spacing:.4px}
+.section-sub{color:var(--muted);margin-bottom:26px}
+
+/* ---------- Feature Cards ---------- */
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px}
+.card h3{font-size:1.05rem;margin-bottom:8px;letter-spacing:.3px}
+.card p{color:var(--muted);font-size:.92rem}
+.card .icon{font-size:1.3rem;margin-bottom:10px;display:inline-block}
+
+/* ---------- How It Works ---------- */
+.steps{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:step}
+.steps li{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
+.steps li::before{counter-increment:step;content:"0" counter(step);color:var(--accent);font-weight:700;display:block;margin-bottom:8px;font-family:var(--font-head);font-size:1.1rem}
+
+/* ---------- Trust Strip ---------- */
+.trust-inner{background:var(--navy);border:1px solid var(--border);border-radius:12px;padding:30px;text-align:center}
+.trust-inner p{color:#c7d3e2;max-width:640px;margin:10px auto 0}
+
+/* ---------- Forms ---------- */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;background:var(--bg-soft);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:11px 12px;font:inherit}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--accent)}
+
+/* ---------- Wizard Layout ---------- */
+.wizard{display:grid;grid-template-columns:250px 1fr;gap:24px;padding:30px 0}
+.wizard-steps{list-style:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;height:fit-content;position:sticky;top:76px}
+.wizard-steps li{padding:10px 12px;border-radius:6px;color:var(--muted);font-size:.93rem;display:flex;gap:10px;cursor:pointer}
+.wizard-steps li .num{font-weight:700;font-family:var(--font-head)}
+.wizard-steps li.active{background:var(--bg-soft);color:var(--text);border:1px solid var(--border)}
+.wizard-steps li.active .num{color:var(--accent)}
+.wizard-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:26px}
+.wizard-actions{display:flex;justify-content:space-between;margin-top:22px}
+.panel-title{font-size:1.3rem;font-weight:700;letter-spacing:.3px}
+
+/* ---------- Evidence ---------- */
+.dropzone{border:1.5px dashed var(--border);border-radius:10px;padding:26px;text-align:center;color:var(--muted);background:var(--bg-soft)}
+.dropzone:hover{border-color:var(--accent)}
+.exhibit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px}
+.exhibit{border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--bg-soft)}
+.exhibit img{border-radius:4px}
+.exhibit .tag{font-size:.78rem;color:var(--accent);margin-top:6px;font-weight:600}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--border);margin-top:40px}
+.foot-inner{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px;padding:34px 20px;max-width:var(--maxw);margin:0 auto}
+.foot-inner h4{margin-bottom:10px;font-size:.95rem;font-family:var(--font-head);letter-spacing:.4px}
+.foot-inner p,.foot-inner a{color:var(--muted);font-size:.88rem}
+.foot-links{display:grid;gap:6px}
+.foot-bottom{text-align:center;color:var(--muted);font-size:.82rem;padding:14px;border-top:1px solid var(--border)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding-top:40px}
+  .feature-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .wizard{grid-template-columns:1fr}
+  .wizard-steps{position:static;display:flex;overflow-x:auto}
+  .foot-inner{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .feature-grid,.steps{grid-template-columns:1fr}
+  .hero h1{font-size:2.1rem}
+}

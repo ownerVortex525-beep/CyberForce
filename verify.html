@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify a Case — CyberForce Case Report System</title>
+  <link rel="stylesheet" href="css/style.css" onerror="this.onerror=null;this.href='style.css';">
+  <style>
+    .verify-box{max-width:600px;margin:60px auto;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:30px}
+    .verify-result{margin-top:20px;padding:16px;border-radius:8px;border:1px solid var(--border);display:none}
+    .verify-result.ok{border-color:#16a34a;background:rgba(22,163,74,.08)}
+    .verify-result.no{border-color:var(--danger);background:rgba(185,28,28,.08)}
+    .vrow{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;padding:6px 0;border-bottom:1px dashed var(--border);color:var(--muted)}
+    .vrow b{color:var(--text)}
+    .note{color:var(--muted);font-size:.82rem;margin-top:14px}
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo.png" alt="CyberForce" class="brand-logo" onerror="this.style.display='none'">
+        <span class="brand-name">Cyber<span class="bf">Force</span></span>
+        <span class="brand-tag">Case Report System</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="report.html">Create Report</a>
+        <a href="verify.html" class="active">Verify</a>
+        <a href="my-reports.html">My Reports</a>
+        <a href="rules.html">Rules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="verify-box">
+      <h2 class="panel-title">Case Verification</h2>
+      <p class="panel-sub">Report par likha Case ID enter karein — ya QR scan karke aaye hain toh auto-verify hoga.</p>
+      <div class="field"><label>Case ID</label><input id="caseInput" placeholder="CF-2026-1234"></div>
+      <button class="btn btn-primary" id="verifyBtn">Verify</button>
+      <div class="verify-result" id="result"></div>
+      <p class="note">🔒 Privacy note: Records usi device par store hote hain jahan report banayi gayi thi (100% client-side system). Doosre device par verify karne ke liye printed report ka Case ID aur evidence ke SHA-256 hashes manually match karein.</p>
+    </div>
+  </main>
+   <script src="js/tracker.js"></script>
+  <script>
+    const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const input = document.getElementById('caseInput');
+    const pre = new URLSearchParams(location.search).get('id');
+    if (pre) input.value = pre;
+
+    function doVerify(){
+      const id = input.value.trim();
+      const box = document.getElementById('result');
+      if (!id) { alert('Case ID enter karein.'); return; }
+      const list = JSON.parse(localStorage.getItem('cf_reports') || '[]');
+      const rec = list.find(r => r.caseId === id);
+      box.style.display = 'block';
+      if (window.CF_TRACK) CF_TRACK(rec ? 'verify_ok' : 'verify_fail', id);
+      if (rec) {
+        box.className = 'verify-result ok';
+        box.innerHTML = `<strong>✅ Record Found — Authentic Report</strong>
+          <div class="vrow"><span>Case ID</span><b>${esc(rec.caseId)}</b></div>
+          <div class="vrow"><span>Generated</span><b>${esc(rec.date)}</b></div>
+          <div class="vrow"><span>Suspect</span><b>${esc(rec.suspect) || '—'}</b></div>
+          <div class="vrow"><span>Crime Type</span><b>${esc(rec.type) || '—'}</b></div>`;
+      } else {
+        box.className = 'verify-result no';
+        box.innerHTML = `<strong>❌ No record found on this device.</strong><br>
+          <span class="note">Yeh report kisi doosre device par banayi gayi ho sakti hai (privacy-first design). Authenticity ke liye printed report ke Case ID, date aur SHA-256 evidence hashes match karein.</span>`;
+      }
+    }
+    document.getElementById('verifyBtn').addEventListener('click', doVerify);
+    if (pre) doVerify();
+  </script>
+
+</body>
+</html>

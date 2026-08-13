@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Reports — CyberForce Case Report System</title>
+  <link rel="stylesheet" href="css/style.css" onerror="this.onerror=null;this.href='style.css';">
+  <style>
+    .rep-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+    .rep-info b{font-family:var(--font-head);letter-spacing:.5px;font-size:1.05rem}
+    .rep-meta{color:var(--muted);font-size:.85rem;margin-top:4px}
+    .rep-actions{display:flex;gap:8px}
+    .btn-small{padding:8px 14px;font-size:.85rem}
+    .btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+    .draft-banner{background:var(--navy);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:26px 0 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .empty{color:var(--muted);text-align:center;padding:50px 0}
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo.png" alt="CyberForce" class="brand-logo" onerror="this.style.display='none'">
+        <span class="brand-name">Cyber<span class="bf">Force</span></span>
+        <span class="brand-tag">Case Report System</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="report.html">Create Report</a>
+        <a href="verify.html">Verify</a>
+        <a href="my-reports.html" class="active">My Reports</a>
+        <a href="rules.html">Rules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top:20px">
+    <h2 class="section-title">My Reports</h2>
+    <p class="section-sub">Aapke exported reports aur drafts — sirf is device par (100% private).</p>
+
+    <div class="draft-banner" id="draftBanner" style="display:none">
+      <span>📝 <strong>Draft in progress</strong> — adhuri report pending hai.</span>
+      <a href="report.html" class="btn btn-primary btn-small">Continue Draft</a>
+    </div>
+
+    <div id="repList"></div>
+    <p style="text-align:center;margin:20px 0"><a href="report.html" class="btn btn-primary">+ New Report</a></p>
+  </main>
+
+  <script>
+    const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (localStorage.getItem('cf_draft')) document.getElementById('draftBanner').style.display = 'flex';
+
+    function getList(){ return JSON.parse(localStorage.getItem('cf_reports') || '[]'); }
+
+    function render(){
+      const list = getList();
+      const wrap = document.getElementById('repList');
+      if (!list.length) { wrap.innerHTML = '<p class="empty">Abhi tak koi report export nahi hui.<br>Pehli report banane ke liye "New Report" par click karein.</p>'; return; }
+      wrap.innerHTML = list.map((r, i) => `
+        <div class="rep-card">
+          <div class="rep-info">
+            <b>${esc(r.caseId)}</b>
+            <div class="rep-meta">${esc(r.type) || '—'} · Suspect: ${esc(r.suspect) || '—'} · ${esc(r.date)}</div>
+          </div>
+          <div class="rep-actions">
+            <a href="verify.html?id=${encodeURIComponent(r.caseId)}" class="btn btn-secondary btn-small">Verify</a>
+            <button class="btn btn-danger btn-small" data-i="${i}">Delete</button>
+          </div>
+        </div>`).join('');
+      wrap.querySelectorAll('.btn-danger').forEach(b => b.addEventListener('click', () => {
+        if (!confirm('Yeh record delete karein?')) return;
+        const l = getList(); l.splice(+b.dataset.i, 1);
+        localStorage.setItem('cf_reports', JSON.stringify(l));
+        render();
+      }));
+    }
+    render();
+  </script>
+
+</body>
+</html>
