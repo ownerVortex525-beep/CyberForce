@@ -13,17 +13,19 @@
     .skin-switch label{font-size:.85rem;display:flex;gap:6px;align-items:center;cursor:pointer;color:var(--muted)}
     body[data-theme="dark"] .skin-switch label{color:var(--muted-inv)}
     body[data-theme="dark"] #themeToggle{border-color:#fff;color:#fff}
-    #photoPreview{width:110px;height:130px;object-fit:cover;border:1px solid #111;margin-top:8px}
+    #photoPreview{width:110px;height:132px;object-fit:contain;border:1px solid #111;margin-top:8px;background:#fff}
     body[data-theme="dark"] #photoPreview{border-color:var(--accent)}
-    /* PDF-safe sheet */
+    /* PDF-safe sheet + RATIO-LOCKED images (stretch impossible) */
     .sheet .meta{display:block}.sheet .meta span{display:inline-block;margin-right:18px}
     .sheet .rrow{display:block;line-height:1.55}.sheet .rl{display:inline;min-width:0;margin-right:6px}
     .sheet .rv{display:inline;word-break:break-word}
     .sheet .sig{display:block}.sheet .sig > span{display:block;margin-bottom:10px}
     .sheet .stamp{display:block;line-height:90px;text-align:center}
-    .sheet .exgrid{display:block}.sheet .ex{display:inline-block;vertical-align:top;margin:0 14px 14px 0;max-width:48%}
-    .sheet .ex img{display:block;margin:0 auto;border:1px solid #999;background:#fff}
-    .sheet .photo{float:right;margin:0 0 10px 14px;border:2px solid #0b2447;outline:1px solid #1d4ed8}
+    .sheet .exgrid{display:block !important}
+    .sheet .ex{display:inline-block !important;vertical-align:top;margin:0 14px 14px 0;max-width:100% !important}
+    .sheet .ex img{display:block;margin:0 auto;border:1px solid #999;background:#fff;width:240px !important;height:320px !important;max-height:none !important;object-fit:initial !important}
+    .sheet .photo{float:right;margin:0 0 10px 14px;border:2px solid #0b2447;outline:1px solid #1d4ed8;background:#fff;width:110px !important;height:132px !important;object-fit:initial !important}
+    .sheet.black .ex img{border-color:#444}
   </style>
 </head>
 <body data-theme="light">
@@ -124,7 +126,7 @@
 
         <div class="step-panel" data-step="4">
           <h2 class="panel-title">Evidence</h2>
-          <p class="panel-sub">Upload screenshots. A Crop & Zoom editor will open — set the image and press SAVE. Each exhibit gets a SHA-256 hash.</p>
+          <p class="panel-sub">Upload screenshots. A Crop & Zoom editor opens — set the frame and press SAVE. Images are saved exactly as set, never stretched.</p>
           <div class="dropzone" id="dropzone">Click or drag and drop screenshots here</div>
           <input type="file" id="fileInput" accept="image/*" multiple hidden>
           <div class="exhibit-grid" id="exhibitGrid"></div>
@@ -189,7 +191,7 @@
 
   <script>
   /* ================= CONFIG ================= */
-  window.CF_SITE_URL = 'https://cyberforcereport.netlify.app'; // apna Netlify URL (QR ke liye)
+  window.CF_SITE_URL = 'https://cyberforcereport.netlify.app'; // apna Netlify URL
   window.CF_SHEET_URL = ''; // Apps Script URL (tracking, optional)
 
   /* ================= TRACKER ================= */
@@ -200,14 +202,11 @@
 
   /* ================= CASE ID + QR + META ================= */
   window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-  function verifyLink(d){
-    const id = d.caseId || window.CF_CASE_ID;
-    return window.CF_SITE_URL ? (window.CF_SITE_URL + '/verify.html?id=' + encodeURIComponent(id)) : ('CyberForce Case ' + id + ' | Generated ' + d.date);
-  }
   window.renderQR = function(box, d){
     if (!box || !window.QRCode) return;
     box.innerHTML = '';
-    new QRCode(box, { text: verifyLink(d), width: 84, height: 84, correctLevel: QRCode.CorrectLevel.M });
+    const url = window.CF_SITE_URL ? (window.CF_SITE_URL + '/verify.html?id=' + encodeURIComponent(d.caseId)) : ('CyberForce Case ' + d.caseId + ' | Generated ' + d.date);
+    new QRCode(box, { text: url, width: 84, height: 84, correctLevel: QRCode.CorrectLevel.M });
     const c = document.createElement('div');
     c.style.fontSize = '10px'; c.style.marginTop = '4px';
     c.textContent = 'Scan: ' + d.caseId;
@@ -225,20 +224,28 @@
   const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const ml = s => esc(s).replace(/\n/g,'<br>');
-  function fitSize(w, h, maxW, maxH){
-    const s = Math.min(maxW / (w || 1), maxH / (h || 1), 1);
-    return { w: Math.max(40, Math.round((w || 1) * s)), h: Math.max(40, Math.round((h || 1) * s)) };
-  }
   function readDataURL(f){ return new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); }); }
-  function readSize(dataUrl){ return new Promise(res => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.src = dataUrl; }); }
+  function dataUrlBytes(dataUrl){ const bin = atob(dataUrl.split(',')[1]); const b = new Uint8Array(bin.length); for (let j = 0; j < bin.length; j++) b[j] = bin.charCodeAt(j); return b; }
   async function hashDataUrl(dataUrl){
-    try {
-      const bin = atob(dataUrl.split(',')[1]);
-      const bytes = new Uint8Array(bin.length);
-      for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
-      const d = await crypto.subtle.digest('SHA-256', bytes);
-      return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2,'0')).join('');
-    } catch(e) { return 'hash-unavailable'; }
+    try { const d = await crypto.subtle.digest('SHA-256', dataUrlBytes(dataUrl)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2,'0')).join(''); }
+    catch(e) { return 'hash-unavailable'; }
+  }
+  /* RATIO-LOCK: image ko fixed-ratio canvas mein bina squeeze set karo (white margins, no stretch) */
+  function normalizeImage(dataUrl, W, H){
+    return new Promise(res => {
+      const im = new Image();
+      im.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const x = c.getContext('2d');
+        x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
+        const s = Math.min(W / im.width, H / im.height);
+        const w = im.width * s, h = im.height * s;
+        x.drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
+        res(c.toDataURL('image/png'));
+      };
+      im.src = dataUrl;
+    });
   }
 
   /* ================= CROP + ZOOM EDITOR ================= */
@@ -286,7 +293,7 @@
     box.querySelector('#cfEdCancel').addEventListener('click', () => { document.body.removeChild(ov); if (onCancel) onCancel(); });
   }
 
-  /* ================= EVIDENCE ================= */
+  /* ================= EVIDENCE (normalized = no stretch) ================= */
   window.Evidence = { list: [], photo: null };
   const dz = document.getElementById('dropzone');
   const fi = document.getElementById('fileInput');
@@ -303,10 +310,11 @@
       if (f.size > 8 * 1024 * 1024) { alert('File must be under 8MB: ' + f.name); continue; }
       if (Evidence.list.length >= 12) { alert('Maximum 12 exhibits allowed.'); break; }
       const raw = await readDataURL(f);
-      const edited = await new Promise(res => openEditor(raw, 330, 430, (url, w, h) => res({ url, w, h }), () => res(null)));
+      const edited = await new Promise(res => openEditor(raw, 600, 800, (url) => res(url), () => res(null)));
       if (!edited) continue;
-      const hash = await hashDataUrl(edited.url);
-      Evidence.list.push({ name: f.name, dataUrl: edited.url, hash, w: edited.w, h: edited.h });
+      const norm = await normalizeImage(edited, 600, 800);
+      const hash = await hashDataUrl(norm);
+      Evidence.list.push({ name: f.name, dataUrl: norm, hash, w: 600, h: 800 });
       renderExhibits();
     }
   }
@@ -316,17 +324,18 @@
     if (!f || !f.type.startsWith('image/')) return;
     if (f.size > 8 * 1024 * 1024) { alert('Photo must be under 8MB.'); this.value = ''; return; }
     const raw = await readDataURL(f);
-    openEditor(raw, 240, 280, (url, w, h) => {
-      Evidence.photo = { dataUrl: url, w, h };
+    openEditor(raw, 300, 360, async (url) => {
+      const norm = await normalizeImage(url, 300, 360);
+      Evidence.photo = { dataUrl: norm, w: 300, h: 360 };
       const pv = document.getElementById('photoPreview');
-      pv.src = url; pv.style.display = 'block';
+      pv.src = norm; pv.style.display = 'block';
     }, () => {});
   });
 
   function renderExhibits(){
     grid.innerHTML = Evidence.list.map((e, i) => `
       <div class="exhibit">
-        <img src="${e.dataUrl}" alt="Exhibit ${String.fromCharCode(65 + i)}">
+        <img src="${e.dataUrl}" alt="Exhibit ${String.fromCharCode(65 + i)}" style="width:100%;height:auto">
         <div class="tag">Exhibit ${String.fromCharCode(65 + i)}</div>
         <div class="hash">${e.hash.slice(0, 18)}...</div>
         <button class="rm" data-i="${i}">Remove</button>
@@ -368,7 +377,6 @@
   document.getElementById('btnBack').addEventListener('click', () => showStep(Math.max(1, current - 1)));
   document.querySelectorAll('.wizard-steps li').forEach(li => li.addEventListener('click', () => { const t = +li.dataset.step; if (t <= current) showStep(t); }));
 
-  /* Auto-clear after export */
   ['btnPdf','btnDoc'].forEach(id => document.getElementById(id).addEventListener('click', () => {
     setTimeout(() => { localStorage.removeItem('cf_draft'); if (confirm('Report downloaded. Clear all data and start a NEW report?')) location.reload(); }, 1200);
   }));
@@ -382,7 +390,7 @@
     const ph = Evidence.photo;
     return {
       caseId: window.CF_CASE_ID, date: new Date().toLocaleString(),
-      suspect: { photo: ph ? ph.dataUrl : '', photoW: ph ? ph.w : 0, photoH: ph ? ph.h : 0, name: val('sName'), phone: val('sPhone'), alt: val('sAltPhone'), pay: val('sPayment'), upi: val('sUpi'), crypto: val('sCrypto'), insta: val('sInsta'), tgUser: val('sTgUser'), tgId: val('sTgId'), social: val('sSocial'), other: val('sOther') },
+      suspect: { photo: ph ? ph.dataUrl : '', name: val('sName'), phone: val('sPhone'), alt: val('sAltPhone'), pay: val('sPayment'), upi: val('sUpi'), crypto: val('sCrypto'), insta: val('sInsta'), tgUser: val('sTgUser'), tgId: val('sTgId'), social: val('sSocial'), other: val('sOther') },
       crime: { type: val('cType'), platform: val('cPlatform'), date: val('cDate') ? new Date(val('cDate')).toLocaleString() : '', amount: val('cAmount') },
       desc: val('dText'), evidence: Evidence.list,
       officer: { received: val('oReceived'), station: val('oStation'), status: val('oStatus'), remarks: val('oRemarks') },
@@ -393,18 +401,16 @@
   function row(label, value, mono){ if (!value) return ''; return `<div class="rrow"><span class="rl">${label}:</span> <span class="rv ${mono ? 'mono' : ''}">${ml(value)}</span></div>`; }
 
   function buildReportHTML(d, black){
-    const ex = d.evidence.map((e, i) => {
-      const sz = fitSize(e.w, e.h, 330, 430);
-      return `<figure class="ex"><img src="${e.dataUrl}" style="width:${sz.w}px;height:${sz.h}px"><figcaption>Exhibit ${String.fromCharCode(65 + i)} - SHA-256: ${e.hash.slice(0, 16)}...</figcaption></figure>`;
-    }).join('');
-    const ph = d.suspect.photo ? fitSize(d.suspect.photoW, d.suspect.photoH, 120, 140) : null;
+    const ex = d.evidence.map((e, i) =>
+      `<figure class="ex"><img src="${e.dataUrl}"><figcaption>Exhibit ${String.fromCharCode(65 + i)} - SHA-256: ${e.hash.slice(0, 16)}...</figcaption></figure>`
+    ).join('');
     return `
     <div class="sheet ${black ? 'black' : ''}">
       <h1>Cyber Crime Evidence Report</h1>
       <div class="meta"><span>Case ID: <b>${d.caseId}</b></span><span>Generated: <b>${d.date}</b></span></div>
       ${d.suspect.name ? `<p class="subj">Complaint against: <b>${esc(d.suspect.name)}</b></p>` : ''}
       <h2>Suspect Information</h2>
-      ${d.suspect.photo && ph ? `<img class="photo" src="${d.suspect.photo}" style="width:${ph.w}px;height:${ph.h}px" alt="Suspect photograph">` : ''}
+      ${d.suspect.photo ? `<img class="photo" src="${d.suspect.photo}" alt="Suspect photograph">` : ''}
       ${row('Suspect / Accused Name', d.suspect.name)}
       ${row('Primary Phone Number', d.suspect.phone, 1)}
       ${row('Alternative Number', d.suspect.alt, 1)}
@@ -454,7 +460,7 @@
   document.querySelectorAll('input[name="skin"]').forEach(r => r.addEventListener('change', renderPreview));
   document.getElementById('btnPrint').addEventListener('click', () => { CF_TRACK('print'); window.print(); });
 
-  /* ================= PDF EXPORT (safe cuts, no stretch) ================= */
+  /* ================= PDF (safe cuts + ratio-locked images) ================= */
   document.getElementById('btnPdf').addEventListener('click', async () => {
     const btn = document.getElementById('btnPdf');
     const sheet = document.querySelector('#reportPreview .sheet');
@@ -488,7 +494,7 @@
     btn.disabled = false; btn.textContent = 'Download PDF';
   });
 
-  /* ================= DOCX EXPORT (complete, no missing parts) ================= */
+  /* ================= DOCX (photo + evidence, all normalized PNG) ================= */
   document.getElementById('btnDoc').addEventListener('click', async () => {
     const d = window.__CF_LAST_DATA;
     if (!d) { alert('Generate the preview first.'); return; }
@@ -500,21 +506,15 @@
       const H = t => new Paragraph({ text: t, heading: HeadingLevel.HEADING_2, spacing: { before: 220, after: 100 } });
       const row = (l, v) => v ? new Paragraph({ children: [new TextRun({ text: l + ': ', bold: true }), new TextRun({ text: v })], spacing: { after: 80 } }) : null;
       const add = (l, v) => { const r = row(l, v); if (r) children.push(r); };
-      async function imgRun(dataUrl, maxW, w, h){
-        const sz = (w && h) ? { w, h } : await readSize(dataUrl);
-        const s = Math.min(maxW / sz.w, 1);
-        const bin = atob(dataUrl.split(',')[1]);
-        const bytes = new Uint8Array(bin.length);
-        for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
-        return new Paragraph({ children: [new ImageRun({ type: 'png', data: bytes, transformation: { width: Math.round(sz.w * s), height: Math.round(sz.h * s) } })], spacing: { after: 120 } });
-      }
+      const imgPara = (dataUrl, w, h) => new Paragraph({ children: [new ImageRun({ type: 'png', data: dataUrlBytes(dataUrl), transformation: { width: w, height: h } })], spacing: { after: 120 } });
+
       const children = [];
       children.push(new Paragraph({ children: [new TextRun({ text: 'CYBER CRIME EVIDENCE REPORT', bold: true, size: 32 })], spacing: { after: 120 } }));
       children.push(P('CyberForce Case Report System', { size: 18, color: '0b2447' }));
       children.push(P('Case ID: ' + d.caseId + '   |   Generated: ' + d.date, { size: 20 }));
       if (d.suspect.name) children.push(P('Complaint against: ' + d.suspect.name, { bold: true }));
       children.push(H('Suspect Information'));
-      if (d.suspect.photo) { try { children.push(await imgRun(d.suspect.photo, 110, d.suspect.photoW, d.suspect.photoH)); children.push(P('Suspect Photograph', { italics: true, size: 16 })); } catch(e){} }
+      if (d.suspect.photo) { try { children.push(imgPara(d.suspect.photo, 110, 132)); children.push(P('Suspect Photograph', { italics: true, size: 16 })); } catch(e){} }
       add('Suspect / Accused Name', d.suspect.name); add('Primary Phone Number', d.suspect.phone);
       add('Alternative Number', d.suspect.alt); add('Payment Methods', d.suspect.pay);
       add('UPI ID', d.suspect.upi); add('Crypto Wallet Address', d.suspect.crypto);
@@ -531,7 +531,7 @@
       for (let i = 0; i < d.evidence.length; i++) {
         const e = d.evidence[i];
         children.push(new Paragraph({ children: [new TextRun({ text: 'Exhibit ' + String.fromCharCode(65 + i) + ' - SHA-256: ' + e.hash.slice(0, 16) + '...', bold: true, size: 18 })], spacing: { after: 60 } }));
-        try { children.push(await imgRun(e.dataUrl, 320, e.w, e.h)); } catch(err){}
+        try { children.push(imgPara(e.dataUrl, 240, 320)); } catch(err){}
       }
       children.push(H('Officer Use'));
       children.push(row('Received By (Name / ID)', d.officer.received) || P('Received By (Name / ID): ____________________'));
