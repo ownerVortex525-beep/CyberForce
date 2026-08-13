@@ -37,10 +37,10 @@
 
   <main class="container" style="padding-top:20px">
     <h2 class="section-title">My Reports</h2>
-    <p class="section-sub">Aapke exported reports aur drafts — sirf is device par (100% private).</p>
+    <p class="section-sub">Your exported reports and drafts — stored only on this device (100% private).</p>
 
     <div class="draft-banner" id="draftBanner" style="display:none">
-      <span>📝 <strong>Draft in progress</strong> — adhuri report pending hai.</span>
+      <span>📝 <strong>Draft in progress</strong> — an unfinished report is pending.</span>
       <a href="report.html" class="btn btn-primary btn-small">Continue Draft</a>
     </div>
 
@@ -57,7 +57,7 @@
     function render(){
       const list = getList();
       const wrap = document.getElementById('repList');
-      if (!list.length) { wrap.innerHTML = '<p class="empty">Abhi tak koi report export nahi hui.<br>Pehli report banane ke liye "New Report" par click karein.</p>'; return; }
+      if (!list.length) { wrap.innerHTML = '<p class="empty">No reports exported yet.<br>Click "+ New Report" to create your first one.</p>'; return; }
       wrap.innerHTML = list.map((r, i) => `
         <div class="rep-card">
           <div class="rep-info">
@@ -70,7 +70,7 @@
           </div>
         </div>`).join('');
       wrap.querySelectorAll('.btn-danger').forEach(b => b.addEventListener('click', () => {
-        if (!confirm('Yeh record delete karein?')) return;
+        if (!confirm('Delete this record?')) return;
         const l = getList(); l.splice(+b.dataset.i, 1);
         localStorage.setItem('cf_reports', JSON.stringify(l));
         render();
