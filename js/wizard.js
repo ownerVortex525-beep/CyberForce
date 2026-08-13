@@ -1,4 +1,4 @@
-/* ============ CyberForce Wizard Logic (v4) ============ */
+/* ============ CyberForce Wizard Logic (v5 — Complete) ============ */
 let current = 1;
 let startedTracked = false;
 window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -113,6 +113,7 @@ function buildReportHTML(d, black){
   <div class="sheet ${black ? 'black' : ''}">
     <h1>Cyber Crime Evidence Report</h1>
     <div class="meta"><span>Case ID: <b>${d.caseId}</b></span><span>Generated: <b>${d.date}</b></span></div>
+    ${d.suspect.name ? `<p class="subj">Complaint against: <b>${esc(d.suspect.name)}</b></p>` : ''}
 
     <h2>Suspect Information</h2>
     ${d.suspect.photo ? `<img class="photo" src="${d.suspect.photo}" alt="Suspect photograph">` : ''}
