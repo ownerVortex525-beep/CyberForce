@@ -1,21 +1,30 @@
-/* ============ DOCX Export (Final v2 + Tracking) ============ */
+/* ============ CyberForce DOCX Export v9 ============ */
+console.log('CyberForce docx v9 loaded');
 document.getElementById('btnDoc').addEventListener('click', async () => {
   const d = window.__CF_LAST_DATA;
-  if (!d) { alert('Pehle Step 7 mein preview generate karein.'); return; }
+  if (!d) { alert('Generate the preview first.'); return; }
   const btn = document.getElementById('btnDoc');
-  btn.disabled = true; btn.textContent = 'Generating…';
+  btn.disabled = true; btn.textContent = 'Generating...';
   try {
     const { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel } = window.docx;
-    const P = (text, o = {}) => new Paragraph({ children: [new TextRun({ text, bold: o.bold, size: o.size, color: o.color })], spacing: { after: o.after ?? 120 } });
+    const P = (text, o = {}) => new Paragraph({ children: [new TextRun({ text, bold: o.bold, size: o.size, color: o.color, italics: o.italics })], spacing: { after: o.after ?? 120 } });
     const H = t => new Paragraph({ text: t, heading: HeadingLevel.HEADING_2, spacing: { before: 220, after: 100 } });
     const row = (l, v) => v ? new Paragraph({ children: [new TextRun({ text: l + ': ', bold: true }), new TextRun({ text: v })], spacing: { after: 80 } }) : null;
     const add = (l, v) => { const r = row(l, v); if (r) children.push(r); };
+    const bytes = dataUrl => { const bin = atob(dataUrl.split(',')[1]); const b = new Uint8Array(bin.length); for (let j = 0; j < bin.length; j++) b[j] = bin.charCodeAt(j); return b; };
+    const imgPara = (dataUrl, w, h) => new Paragraph({ children: [new ImageRun({ type: 'png', data: bytes(dataUrl), transformation: { width: w, height: h } })], spacing: { after: 120 } });
 
     const children = [];
-    children.push(new Paragraph({ children: [new TextRun({ text: 'CYBER CRIME EVIDENCE REPORT', bold: true, size: 32 })], spacing: { after: 160 } }));
+    children.push(new Paragraph({ children: [new TextRun({ text: 'CYBER CRIME EVIDENCE REPORT', bold: true, size: 32 })], spacing: { after: 120 } }));
+    children.push(P('CyberForce Case Report System', { size: 18, color: '0b2447' }));
     children.push(P('Case ID: ' + d.caseId + '   |   Generated: ' + d.date, { size: 20 }));
+    if (d.suspect.name) children.push(P('Complaint against: ' + d.suspect.name, { bold: true }));
 
     children.push(H('Suspect Information'));
+    if (d.suspect.photo && d.suspect.photoW) {
+      children.push(imgPara(d.suspect.photo, d.suspect.photoW, d.suspect.photoH));
+      children.push(P('Suspect Photograph', { italics: true, size: 16 }));
+    }
     add('Suspect / Accused Name', d.suspect.name); add('Primary Phone Number', d.suspect.phone);
     add('Alternative Number', d.suspect.alt); add('Payment Methods', d.suspect.pay);
     add('UPI ID', d.suspect.upi); add('Crypto Wallet Address', d.suspect.crypto);
@@ -25,7 +34,7 @@ document.getElementById('btnDoc').addEventListener('click', async () => {
 
     children.push(H('Crime Details'));
     add('Crime Type', d.crime.type); add('Platform Used', d.crime.platform);
-    add('Date & Time of Incident', d.crime.date); add('Amount Lost', d.crime.amount);
+    add('Date and Time of Incident', d.crime.date); add('Amount Lost', d.crime.amount);
 
     children.push(H('Description'));
     children.push(P(d.desc || '—'));
@@ -34,14 +43,8 @@ document.getElementById('btnDoc').addEventListener('click', async () => {
     if (!d.evidence.length) children.push(P('No evidence attached.'));
     for (let i = 0; i < d.evidence.length; i++) {
       const e = d.evidence[i];
-      children.push(new Paragraph({ children: [new TextRun({ text: 'Exhibit ' + String.fromCharCode(65 + i) + ' · SHA-256: ' + e.hash.slice(0, 16) + '…', bold: true, size: 18 })], spacing: { after: 60 } }));
-      try {
-        const bin = atob(e.dataUrl.split(',')[1]);
-        const bytes = new Uint8Array(bin.length);
-        for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
-        const w = e.w || 600, h = e.h || 400;
-        children.push(new Paragraph({ children: [new ImageRun({ type: 'png', data: bytes, transformation: { width: 420, height: Math.round(h * (420 / w)) } })], spacing: { after: 120 } }));
-      } catch (err) {}
+      children.push(new Paragraph({ children: [new TextRun({ text: 'Exhibit ' + String.fromCharCode(65 + i) + ' - SHA-256: ' + e.hash.slice(0, 16) + '...', bold: true, size: 18 })], spacing: { after: 60 } }));
+      children.push(imgPara(e.dataUrl, e.w, e.h));
     }
 
     children.push(H('Officer Use'));
@@ -49,13 +52,13 @@ document.getElementById('btnDoc').addEventListener('click', async () => {
     children.push(row('Station / Department / Unit', d.officer.station) || P('Station / Department / Unit: ____________________'));
     children.push(row('Case Status', d.officer.status) || P('Case Status: Open / Under Investigation / Closed'));
     if (d.officer.remarks) add('Officer Remarks', d.officer.remarks);
-    children.push(P('Verification & Stamp: ____________________', { after: 80 }));
+    children.push(P('Verification and Stamp: ____________________', { after: 80 }));
 
     children.push(H('Declaration'));
-    children.push(P('Main ghoshna karta/karti hoon ki is report mein di gayi jankari meri jankari mein sach hai. Yeh report cyber cell / police mein submit karne hetu taiyar ki gayi hai.'));
-    children.push(P('Complainant: ' + d.decl.name + (d.decl.contact ? ' · ' + d.decl.contact : '')));
+    children.push(P('I declare that the information provided in this report is true to my knowledge. This report is prepared for submission to the cyber cell / police.'));
+    children.push(P('Complainant: ' + d.decl.name + (d.decl.contact ? ' - ' + d.decl.contact : '')));
     children.push(P('Signature: ____________________    Date: ____________________'));
-    children.push(P(d.caseId + ' · Generated by CyberForce Case Report System · National Cyber Crime Helpline: 1930', { size: 16, color: '666666' }));
+    children.push(P(d.caseId + ' - Generated by CyberForce Case Report System - National Cyber Crime Helpline: 1930', { size: 16, color: '666666' }));
 
     const doc = new Document({ sections: [{ children }] });
     const blob = await Packer.toBlob(doc);
