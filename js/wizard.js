@@ -1,21 +1,19 @@
-/* ============ CyberForce Wizard v10 ============ */
-console.log('CyberForce wizard v10 loaded');
+/* ============ CyberForce Wizard v11 ============ */
+console.log('CyberForce wizard v11 loaded');
 let current = 1, startedTracked = false;
 window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
 
-const FIELD_IDS = ['sName','sPhone','sAltPhone','sPayment','sUpi','sCrypto','sInsta','sTgUser','sTgId','sOther','sSocial','cType','cPlatform','cDate','cAmount','dText','oReceived','oStation','oStatus','oRemarks','dName','dContact'];
+const FIELD_IDS = ['sName','sPhone','sAltPhone','sPayment','sUpi','sCrypto','sInsta','sTgUser','sTgId','sOther','sSocial','cType','cPlatform','cDate','cPlace','cAmount','dText','oReceived','oStation','oStatus','oRemarks','dName','dContact'];
 
 const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const ml = s => esc(s).replace(/\n/g,'<br>');
 
-/* ---- theme: DARK default, change only on toggle ---- */
 const themeBtn = document.getElementById('themeToggle');
 function applyTheme(t){ document.body.dataset.theme = t; localStorage.setItem('cf_theme', t); themeBtn.textContent = (t === 'dark') ? 'Light Mode' : 'Dark Mode'; }
 applyTheme(localStorage.getItem('cf_theme') || 'dark');
 themeBtn.addEventListener('click', () => applyTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
 
-/* ---- navigation ---- */
 function showStep(n){
   current = n;
   document.querySelectorAll('.step-panel').forEach(p => p.classList.toggle('show', +p.dataset.step === n));
@@ -40,12 +38,10 @@ document.getElementById('btnNext').addEventListener('click', () => {
 document.getElementById('btnBack').addEventListener('click', () => showStep(Math.max(1, current - 1)));
 document.querySelectorAll('.wizard-steps li').forEach(li => li.addEventListener('click', () => { const t = +li.dataset.step; if (t <= current) showStep(t); }));
 
-/* ---- auto-clear after export ---- */
 ['btnPdf','btnDoc'].forEach(id => document.getElementById(id).addEventListener('click', () => {
   setTimeout(() => { localStorage.removeItem('cf_draft'); if (confirm('Report downloaded. Clear all data and start a NEW report?')) location.reload(); }, 1200);
 }));
 
-/* ---- draft ---- */
 document.getElementById('dText').addEventListener('input', () => { const t = val('dText'); document.getElementById('wordCount').textContent = (t ? t.split(/\s+/).length : 0) + ' words'; });
 document.addEventListener('input', e => { if (e.target.matches('input,textarea,select')) saveDraft(); });
 function saveDraft(){ const o = {}; FIELD_IDS.forEach(id => o[id] = val(id)); o.declCheck = document.getElementById('declCheck').checked; try { localStorage.setItem('cf_draft', JSON.stringify(o)); } catch(e){} }
@@ -56,7 +52,7 @@ function getFormData(){
   return {
     caseId: window.CF_CASE_ID, date: new Date().toLocaleString(),
     suspect: { photo: ph ? ph.dataUrl : '', photoW: ph ? ph.w : 0, photoH: ph ? ph.h : 0, name: val('sName'), phone: val('sPhone'), alt: val('sAltPhone'), pay: val('sPayment'), upi: val('sUpi'), crypto: val('sCrypto'), insta: val('sInsta'), tgUser: val('sTgUser'), tgId: val('sTgId'), social: val('sSocial'), other: val('sOther') },
-    crime: { type: val('cType'), platform: val('cPlatform'), date: val('cDate') ? new Date(val('cDate')).toLocaleString() : '', amount: val('cAmount') },
+    crime: { type: val('cType'), platform: val('cPlatform'), date: val('cDate') ? new Date(val('cDate')).toLocaleString() : '', place: val('cPlace'), amount: val('cAmount') },
     desc: val('dText'), evidence: Evidence.list,
     officer: { received: val('oReceived'), station: val('oStation'), status: val('oStatus'), remarks: val('oRemarks') },
     decl: { name: val('dName'), contact: val('dContact') }
@@ -91,6 +87,7 @@ function buildReportHTML(d, black){
     ${row('Crime Type', d.crime.type)}
     ${row('Platform Used', d.crime.platform)}
     ${row('Date and Time of Incident', d.crime.date)}
+    ${row('Place of Incident', d.crime.place)}
     ${row('Amount Lost', d.crime.amount)}
     <h2>Description</h2>
     <p class="desc">${esc(d.desc) || '—'}</p>
