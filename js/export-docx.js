@@ -34,6 +34,7 @@ document.getElementById('btnDoc').addEventListener('click', async () => {
 
     children.push(H('Crime Details'));
     add('Crime Type', d.crime.type); add('Platform Used', d.crime.platform);
+    add('Place of Incident', d.crime.place);
     add('Date and Time of Incident', d.crime.date); add('Amount Lost', d.crime.amount);
 
     children.push(H('Description'));
