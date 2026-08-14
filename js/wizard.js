@@ -1,5 +1,5 @@
-/* ============ CyberForce Wizard v9 ============ */
-console.log('CyberForce wizard v9 loaded');
+/* ============ CyberForce Wizard v10 ============ */
+console.log('CyberForce wizard v10 loaded');
 let current = 1, startedTracked = false;
 window.CF_CASE_ID = 'CF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
 
@@ -9,10 +9,10 @@ const val = id => { const el = document.getElementById(id); return el ? el.value
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const ml = s => esc(s).replace(/\n/g,'<br>');
 
-/* ---- theme ---- */
+/* ---- theme: DARK default, change only on toggle ---- */
 const themeBtn = document.getElementById('themeToggle');
 function applyTheme(t){ document.body.dataset.theme = t; localStorage.setItem('cf_theme', t); themeBtn.textContent = (t === 'dark') ? 'Light Mode' : 'Dark Mode'; }
-applyTheme(localStorage.getItem('cf_theme') || 'light');
+applyTheme(localStorage.getItem('cf_theme') || 'dark');
 themeBtn.addEventListener('click', () => applyTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark'));
 
 /* ---- navigation ---- */
