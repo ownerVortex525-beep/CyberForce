@@ -1,6 +1,6 @@
-/* ============ CyberForce Evidence v9 ============ */
+/* ============ CyberForce Evidence v10 (High-Res) ============ */
 window.Evidence = { list: [], photo: null };
-console.log('CyberForce evidence v9 loaded');
+console.log('CyberForce evidence v10 loaded');
 
 const dz = document.getElementById('dropzone');
 const fi = document.getElementById('fileInput');
@@ -12,38 +12,25 @@ dz.addEventListener('click', () => fi.click());
 dz.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
 fi.addEventListener('change', () => { handleFiles(fi.files); fi.value = ''; });
 
-/* ---- helpers ---- */
 function readDataURL(f){ return new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); }); }
+function readSize(dataUrl){ return new Promise(res => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.src = dataUrl; }); }
+function fitSize(w, h, maxW, maxH){
+  const s = Math.min(maxW / (w || 1), maxH / (h || 1), 1);
+  return { w: Math.max(60, Math.round((w || 1) * s)), h: Math.max(60, Math.round((h || 1) * s)) };
+}
 function dataUrlBytes(dataUrl){ const bin = atob(dataUrl.split(',')[1]); const b = new Uint8Array(bin.length); for (let j = 0; j < bin.length; j++) b[j] = bin.charCodeAt(j); return b; }
 async function hashDataUrl(dataUrl){
   try { const d = await crypto.subtle.digest('SHA-256', dataUrlBytes(dataUrl)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2,'0')).join(''); }
   catch(e) { return 'hash-unavailable'; }
 }
-/* Ratio preserve karke chhota karo — no bars, no crop, no stretch */
-function normalizeKeepRatio(dataUrl, maxW, maxH){
-  return new Promise(res => {
-    const im = new Image();
-    im.onload = () => {
-      const s = Math.min(maxW / im.width, maxH / im.height, 1);
-      const w = Math.max(60, Math.round(im.width * s)), h = Math.max(60, Math.round(im.height * s));
-      const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      const x = c.getContext('2d');
-      x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, h);
-      x.drawImage(im, 0, 0, w, h);
-      res({ url: c.toDataURL('image/png'), w, h });
-    };
-    im.src = dataUrl;
-  });
-}
 
-/* ---- adaptive crop + zoom editor (portrait & landscape) ---- */
+/* ---- HIGH-RES crop + zoom editor (4x internal resolution) ---- */
 function openEditor(srcUrl, onSave, onCancel){
   const probe = new Image();
   probe.onload = () => {
     const landscape = probe.width > probe.height;
-    const frameW = landscape ? 720 : 560;
-    const frameH = landscape ? 540 : 720;
+    const frameW = landscape ? 1440 : 1120;   /* high-res internal */
+    const frameH = landscape ? 1080 : 1440;
 
     const ov = document.createElement('div');
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
@@ -62,7 +49,7 @@ function openEditor(srcUrl, onSave, onCancel){
     canvas.width = frameW; canvas.height = frameH;
     const zoomIn = box.querySelector('#cfEdZoom');
     const img = probe;
-    const st = { zoom: 1, x: 0, y: 0, base: Math.max(frameW / img.width, frameH / img.height), ready: true };
+    const st = { zoom: 1, x: 0, y: 0, base: Math.max(frameW / img.width, frameH / img.height) };
 
     function clampPan(){
       const s = st.base * st.zoom;
@@ -90,7 +77,7 @@ function openEditor(srcUrl, onSave, onCancel){
   probe.src = srcUrl;
 }
 
-/* ---- evidence uploads ---- */
+/* ---- evidence: high-res save, small display ---- */
 async function handleFiles(files){
   for (const f of files) {
     if (!f.type.startsWith('image/')) continue;
@@ -99,24 +86,26 @@ async function handleFiles(files){
     const raw = await readDataURL(f);
     const edited = await new Promise(res => openEditor(raw, url => res(url), () => res(null)));
     if (!edited) continue;
-    const norm = await normalizeKeepRatio(edited, 280, 360);
-    const hash = await hashDataUrl(norm.url);
-    Evidence.list.push({ name: f.name, dataUrl: norm.url, hash, w: norm.w, h: norm.h });
+    const size = await readSize(edited);
+    const disp = fitSize(size.w, size.h, 240, 320);   /* display size only */
+    const hash = await hashDataUrl(edited);
+    Evidence.list.push({ name: f.name, dataUrl: edited, hash, w: disp.w, h: disp.h });
     renderExhibits();
   }
 }
 
-/* ---- suspect photo ---- */
+/* ---- suspect photo: high-res save, small display ---- */
 document.getElementById('sPhoto').addEventListener('change', async function(){
   const f = this.files[0];
   if (!f || !f.type.startsWith('image/')) return;
   if (f.size > 8 * 1024 * 1024) { alert('Photo must be under 8MB.'); this.value = ''; return; }
   const raw = await readDataURL(f);
   openEditor(raw, async (url) => {
-    const norm = await normalizeKeepRatio(url, 150, 180);
-    Evidence.photo = { dataUrl: norm.url, w: norm.w, h: norm.h };
+    const size = await readSize(url);
+    const disp = fitSize(size.w, size.h, 150, 180);
+    Evidence.photo = { dataUrl: url, w: disp.w, h: disp.h };
     const pv = document.getElementById('photoPreview');
-    pv.src = norm.url; pv.style.display = 'block';
+    pv.src = url; pv.style.display = 'block';
   }, () => {});
 });
 
