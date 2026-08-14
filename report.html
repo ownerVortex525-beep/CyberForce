@@ -4,17 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Report — CyberForce Case Report System</title>
-  <link rel="stylesheet" href="css/style.css?v=6" onerror="this.onerror=null;this.href='style.css';">
+  <link rel="stylesheet" href="css/style.css?v=11" onerror="this.onerror=null;this.href='style.css';">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     .step-panel{display:none}
     .step-panel.show{display:block}
     .page-bar{display:flex;justify-content:space-between;align-items:center;padding-top:26px;gap:12px;flex-wrap:wrap}
+    /* Theme button: dono themes mein solid high-contrast */
+    #themeToggle{background:var(--ink);color:#fff;border-color:var(--ink)}
+    #themeToggle:hover{background:#000;color:#fff}
+    body[data-theme="dark"] #themeToggle{background:#fff;color:#000;border-color:#fff}
+    body[data-theme="dark"] #themeToggle:hover{background:#e6e6e6;color:#000}
+    body[data-theme="dark"] .btn-line-b{border-color:#fff;color:#fff}
+    body[data-theme="dark"] .btn-line-b:hover{background:#fff;color:#000}
     .skin-switch{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
     .skin-switch label{font-size:.85rem;display:flex;gap:6px;align-items:center;cursor:pointer;color:var(--muted)}
     body[data-theme="dark"] .skin-switch label{color:var(--muted-inv)}
-    body[data-theme="dark"] #themeToggle{border-color:#fff;color:#fff}
     #photoPreview{max-width:150px;border:1px solid #111;margin-top:8px;background:#fff}
-    /* RATIO-LOCK: koi bhi purani CSS stretch nahi kar sakti */
+    /* RATIO-LOCK */
     .sheet .meta{display:block !important}
     .sheet .meta span{display:inline-block;margin-right:18px}
     .sheet .rrow{display:block !important;line-height:1.55 !important}
@@ -27,12 +34,17 @@
     .sheet .ex img{display:block !important;margin:0 auto !important;width:auto !important;height:auto !important;max-height:none !important;object-fit:initial !important;border:1px solid #999;background:#fff}
     .sheet .photo{width:auto !important;height:auto !important;object-fit:initial !important;float:right;margin:0 0 10px 14px;border:2px solid #0b2447;outline:1px solid #1d4ed8;background:#fff}
     .sheet.black .ex img{border-color:#444}
-    body[data-theme="dark"] .btn-line-b{border-color:#fff;color:#fff}
-    body[data-theme="dark"] .btn-line-b:hover{background:#fff;color:#000}
-    body[data-theme="dark"] .wizard-panel{box-shadow:0 4px 0 rgba(29,78,216,.15)}
+    /* UNIQUE REPORT TYPOGRAPHY — IBM Plex */
+    .sheet{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+    .sheet h1{font-family:'IBM Plex Serif',Georgia,serif;font-weight:700;letter-spacing:.05em}
+    .sheet h1::after{font-family:'IBM Plex Mono',monospace}
+    .sheet h2{font-family:'IBM Plex Sans',sans-serif;font-weight:700}
+    .sheet .mono{font-family:'IBM Plex Mono',Consolas,monospace}
+    .sheet .meta,.sheet .foot{font-family:'IBM Plex Mono',monospace}
+    .sheet .subj{font-family:'IBM Plex Sans',sans-serif}
   </style>
 </head>
-<body data-theme="light">
+<body data-theme="dark">
 
   <header class="navbar">
     <div class="nav-inner">
@@ -53,14 +65,14 @@
 
   <div class="portal-bar">
     <div class="container portal-inner">
-      <span>CyberForce Secure Portal — Report Filing (v9)</span>
+      <span>CyberForce Secure Portal — Report Filing (v11)</span>
       <span class="portal-lock">Processed only on your device</span>
     </div>
   </div>
 
   <div class="container page-bar">
     <p class="overline">Official Report Builder</p>
-    <button class="btn btn-line-b btn-small" id="themeToggle">Dark Mode</button>
+    <button class="btn btn-small" id="themeToggle">Light Mode</button>
   </div>
 
   <main class="container">
@@ -117,8 +129,9 @@
           </div>
           <div class="grid-2">
             <div class="field"><label>Date and Time of Incident</label><input id="cDate" type="datetime-local"></div>
-            <div class="field"><label>Amount Lost (if any)</label><input id="cAmount" type="text" placeholder="Rs."></div>
+            <div class="field"><label>Place / City of Incident</label><input id="cPlace" type="text" placeholder="City / area"></div>
           </div>
+          <div class="field"><label>Amount Lost (if any)</label><input id="cAmount" type="text" placeholder="Rs."></div>
         </div>
 
         <div class="step-panel" data-step="3">
@@ -130,7 +143,7 @@
 
         <div class="step-panel" data-step="4">
           <h2 class="panel-title">Evidence</h2>
-          <p class="panel-sub">Upload screenshots (portrait or landscape). A Crop & Zoom editor opens — set and press SAVE. Images are never stretched.</p>
+          <p class="panel-sub">Upload screenshots (portrait or landscape). A Crop & Zoom editor opens — set and press SAVE. Images stay sharp and never stretch.</p>
           <div class="dropzone" id="dropzone">Click or drag and drop screenshots here</div>
           <input type="file" id="fileInput" accept="image/*" multiple hidden>
           <div class="exhibit-grid" id="exhibitGrid"></div>
@@ -185,7 +198,7 @@
   </main>
 
   <footer>
-    <div class="foot-bottom">© 2026 CyberForce Case Report System (v9). For education and documentation only.</div>
+    <div class="foot-bottom">© 2026 CyberForce Case Report System (v11). For education and documentation only.</div>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -193,11 +206,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 
-  <script src="js/tracker.js?v=9"></script>
-  <script src="js/evidence.js?v=9"></script>
-  <script src="js/caseid.js?v=9"></script>
-  <script src="js/wizard.js?v=9"></script>
-  <script src="js/export-pdf.js?v=9"></script>
-  <script src="js/export-docx.js?v=9"></script>
+  <script src="js/tracker.js?v=11"></script>
+  <script src="js/evidence.js?v=11"></script>
+  <script src="js/caseid.js?v=11"></script>
+  <script src="js/wizard.js?v=11"></script>
+  <script src="js/export-pdf.js?v=11"></script>
+  <script src="js/export-docx.js?v=11"></script>
 </body>
 </html>
