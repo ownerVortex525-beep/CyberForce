@@ -6,7 +6,8 @@ document.getElementById('btnPdf').addEventListener('click', async () => {
   btn.disabled = true; btn.textContent = 'Generating...';
   try {
     const dark = sheet.classList.contains('black');
-    const canvas = await html2canvas(sheet, { scale: 3, backgroundColor: dark ? '#000000' : '#ffffff', useCORS: true });
+    const scale = (sheet.offsetWidth * 4 <= 6000) ? 4 : 3;
+      const canvas = await html2canvas(sheet, { scale: scale, backgroundColor: dark ? '#000000' : '#ffffff', useCORS: true });
     const ctx = canvas.getContext('2d');
     const bgPx = ctx.getImageData(2, 2, 1, 1).data;
 
