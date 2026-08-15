@@ -15,7 +15,7 @@ document.getElementById('btnDoc').addEventListener('click', async () => {
     const imgPara = (dataUrl, w, h) => new Paragraph({ children: [new ImageRun({ type: 'png', data: bytes(dataUrl), transformation: { width: w, height: h } })], spacing: { after: 120 } });
 
     const children = [];
-    children.push(new Paragraph({ children: [new TextRun({ text: 'CYBER CRIME EVIDENCE REPORT', bold: true, size: 32 })], spacing: { after: 120 } }));
+    children.push(new Paragraph({ children: [new TextRun({ text: 'CYBER CRIME REPORT', bold: true, size: 32 })], spacing: { after: 120 } }));
     children.push(P('CyberForce Case Report System', { size: 18, color: '0b2447' }));
     children.push(P('Case ID: ' + d.caseId + '   |   Generated: ' + d.date, { size: 20 }));
     if (d.suspect.name) children.push(P('Complaint against: ' + d.suspect.name, { bold: true }));
