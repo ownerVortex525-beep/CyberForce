@@ -66,6 +66,13 @@
       #reportPreview,#reportPreview *{visibility:visible}
       #reportPreview{position:absolute;inset:0}
       .sheetpage{box-shadow:none;border:none;margin:0 0 12px}
+      /* ===== v13: spine + watermark badge + legal line ===== */
+    .sp-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:linear-gradient(180deg,#0b2447 0%,#1d4ed8 50%,#0b2447 100%)}
+    .sp-badge{font-family:'Black Ops One',Arial,sans-serif;font-size:14px;color:#ffd75e;letter-spacing:.06em;margin:0 0 8px;text-shadow:0 2px 0 rgba(0,0,0,.65)}
+    .sp-badge span{color:#ffffff}
+    .sp-legal{margin:6px 28px 12px;font-size:10.5px;color:#556;font-family:'IBM Plex Mono',monospace}
+    .sheetpage.black .sp-legal{color:#99a}
+    .sp-head h1{font-size:20px}
     }
   </style>
 </head>
