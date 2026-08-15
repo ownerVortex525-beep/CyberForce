@@ -6,42 +6,66 @@
   <title>Create Report — CyberForce Case Report System</title>
   <link rel="stylesheet" href="css/style.css?v=11" onerror="this.onerror=null;this.href='style.css';">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
+ <style>
     .step-panel{display:none}
     .step-panel.show{display:block}
     .page-bar{display:flex;justify-content:space-between;align-items:center;padding-top:26px;gap:12px;flex-wrap:wrap}
-    /* Theme button: dono themes mein solid high-contrast */
     #themeToggle{background:var(--ink);color:#fff;border-color:var(--ink)}
     #themeToggle:hover{background:#000;color:#fff}
     body[data-theme="dark"] #themeToggle{background:#fff;color:#000;border-color:#fff}
-    body[data-theme="dark"] #themeToggle:hover{background:#e6e6e6;color:#000}
     body[data-theme="dark"] .btn-line-b{border-color:#fff;color:#fff}
     body[data-theme="dark"] .btn-line-b:hover{background:#fff;color:#000}
     .skin-switch{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
     .skin-switch label{font-size:.85rem;display:flex;gap:6px;align-items:center;cursor:pointer;color:var(--muted)}
     body[data-theme="dark"] .skin-switch label{color:var(--muted-inv)}
     #photoPreview{max-width:150px;border:1px solid #111;margin-top:8px;background:#fff}
-    /* RATIO-LOCK */
-    .sheet .meta{display:block !important}
-    .sheet .meta span{display:inline-block;margin-right:18px}
-    .sheet .rrow{display:block !important;line-height:1.55 !important}
-    .sheet .rl{display:inline !important;min-width:0 !important;margin-right:6px}
-    .sheet .rv{display:inline !important;word-break:break-word}
-    .sheet .sig{display:block !important}.sheet .sig > span{display:block;margin-bottom:10px}
-    .sheet .stamp{display:block !important;line-height:90px;text-align:center}
-    .sheet .exgrid{display:block !important}
-    .sheet .ex{display:inline-block !important;vertical-align:top;margin:0 14px 14px 0}
-    .sheet .ex img{display:block !important;margin:0 auto !important;width:auto !important;height:auto !important;max-height:none !important;object-fit:initial !important;border:1px solid #999;background:#fff}
-    .sheet .photo{width:auto !important;height:auto !important;object-fit:initial !important;float:right;margin:0 0 10px 14px;border:2px solid #0b2447;outline:1px solid #1d4ed8;background:#fff}
-    .sheet.black .ex img{border-color:#444}
-    /* UNIQUE REPORT TYPOGRAPHY — IBM Plex */
-    .sheet{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
-    .sheet h1{font-family:'IBM Plex Serif',Georgia,serif;font-weight:700;letter-spacing:.05em}
-    .sheet h1::after{font-family:'IBM Plex Mono',monospace}
-    .sheet h2{font-family:'IBM Plex Sans',sans-serif;font-weight:700}
-    .sheet .mono{font-family:'IBM Plex Mono',Consolas,monospace}
-    .sheet .meta,.sheet .foot{font-family:'IBM Plex Mono',monospace}
-    .sheet .subj{font-family:'IBM Plex Sans',sans-serif}
+
+    /* ============ CASE-FILE SHEET v12 ============ */
+    #reportPreview{margin-top:24px}
+    .sheetpage{background:#fff;color:#111;max-width:820px;margin:0 auto 22px;border:1px solid #bbb;font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+    .sp-head{background:#0b2447;color:#fff;padding:16px 28px;border-bottom:3px solid #1d4ed8}
+    .sp-head .sp-brand{float:right;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;margin-top:6px;color:#9db7e8}
+    .sp-head h1{font-family:'IBM Plex Serif',Georgia,serif;font-size:19px;letter-spacing:.04em;color:#fff;margin:0}
+    .sp-head .sp-sub{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#9db7e8;margin-top:4px}
+    .sp-meta{padding:12px 28px;border-bottom:1px solid #ddd;font-family:'IBM Plex Mono',monospace;font-size:11px}
+    .sp-meta span{display:inline-block;margin-right:24px}
+    .sp-sec{margin:18px 28px 10px;padding:7px 12px;background:#eef2f8;border-left:4px solid #1d4ed8;font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.16em}
+    .ctable{width:100%;border-collapse:collapse;font-size:12.5px;margin:0 0 6px}
+    .ctable td{padding:7px 28px;border-bottom:1px solid #e3e3e3;vertical-align:top}
+    .ctable td.rl{width:42%;font-weight:600;color:#222}
+    .ctable td.rv{word-break:break-word}
+    .ctable .mono{font-family:'IBM Plex Mono',monospace;font-size:11.5px}
+    .suswrap{position:relative;padding-right:175px}
+    .suswrap .ctable td{padding-right:12px}
+    .pbox{position:absolute;top:6px;right:28px;width:132px;border:1px solid #888;background:#fff;padding:5px;text-align:center}
+    .pbox img{width:120px;height:auto;display:block;margin:0 auto}
+    .pbox .pcap{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#555;margin-top:4px;font-family:'IBM Plex Mono',monospace}
+    .descbox{margin:0 28px 10px;font-size:12.5px;white-space:pre-wrap;line-height:1.6}
+    .ex2{float:left;width:46%;margin:0 4% 16px 0;border:1px solid #888;background:#fff;padding:6px}
+    .ex2 img{width:100%;height:auto;display:block}
+    .ex2 .excap{font-size:10px;font-family:'IBM Plex Mono',monospace;margin-top:5px;word-break:break-all}
+    .clear{clear:both}
+    .stampbox{margin:14px 28px;height:90px;border:1px dashed #99a;font-size:10px;color:#667;text-align:center;line-height:90px;letter-spacing:.14em}
+    .sigblock{margin:16px 28px;font-size:12.5px}
+    .sigblock .sline{display:block;margin-bottom:12px}
+    .sigblock .line{display:inline-block;width:220px;border-bottom:1px solid #111}
+    .sp-foot{padding:10px 28px;border-top:1px solid #ccc;font-size:9.5px;color:#666;font-family:'IBM Plex Mono',monospace}
+    .sheetpage.black{background:#000;color:#e8e8e8;border-color:#333}
+    .sheetpage.black .sp-head{background:#000;border-bottom-color:#1d4ed8}
+    .sheetpage.black .sp-sec{background:#101826;color:#cfe0ff}
+    .sheetpage.black .ctable td{border-bottom-color:#222}
+    .sheetpage.black .ctable td.rl{color:#ddd}
+    .sheetpage.black .pbox{background:#000;border-color:#555}
+    .sheetpage.black .pbox .pcap{color:#aaa}
+    .sheetpage.black .ex2{background:#000;border-color:#555}
+    .sheetpage.black .sp-foot{border-top-color:#333;color:#999}
+    .sheetpage.black .stampbox{border-color:#556;color:#99a}
+    @media print{
+      body *{visibility:hidden}
+      #reportPreview,#reportPreview *{visibility:visible}
+      #reportPreview{position:absolute;inset:0}
+      .sheetpage{box-shadow:none;border:none;margin:0 0 12px}
+    }
   </style>
 </head>
 <body data-theme="dark">
